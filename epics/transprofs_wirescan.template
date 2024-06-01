@@ -1,0 +1,31 @@
+
+record(ao, "$(DEVICE):WIRESCAN-MEAN") {
+    field(PREC, "3")
+    field(PINI, "YES")    
+    field(VAL, "6")    
+    field(FLNK, "$(DEVICE):WIRESCAN-A")        
+}
+
+record(ao, "$(DEVICE):WIRESCAN-SIGMA") {
+    field(PREC, "3")
+    field(PINI, "YES")    
+    field(VAL, "1")    
+    field(FLNK, "$(DEVICE):WIRESCAN-A")        
+}
+
+record(acalcout, "$(DEVICE):WIRESCAN-X") {
+    field(PINI, "YES")    
+    field(PREC, "5")    
+    field(NELM, "1024")    
+    field(CALC, "0.01*IX")    
+}
+
+record(acalcout, "$(DEVICE):WIRESCAN-A") {
+    field(PINI, "YES")    
+    field(NELM, "1024")    
+    field(PREC, "5")    
+    field(INPA, "$(DEVICE):WIRESCAN-MEAN NPP")    
+    field(INPB, "$(DEVICE):WIRESCAN-SIGMA NPP")    
+    field(INAA, "$(DEVICE):WIRESCAN-X.AVAL NPP")    
+    field(CALC, "EXP((AA-A)**2/(-2*B**2))/B*SQRT(2*PI)")    
+}

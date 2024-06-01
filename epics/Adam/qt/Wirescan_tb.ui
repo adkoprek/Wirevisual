@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1032</width>
+    <height>567</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="caCartesianPlot" name="cacartesianplot">
+   <property name="geometry">
+    <rect>
+     <x>15</x>
+     <y>85</y>
+     <width>996</width>
+     <height>461</height>
+    </rect>
+   </property>
+   <property name="Title" stdset="0">
+    <string notr="true">Wirescan</string>
+   </property>
+   <property name="TitleX">
+    <string notr="true">Position [mm]</string>
+   </property>
+   <property name="TitleY">
+    <string notr="true">Amplitude</string>
+   </property>
+   <property name="channels_1" stdset="0">
+    <string>$(DEVICE):WIRESCAN-X.AVAL;$(DEVICE):WIRESCAN-A.AVAL</string>
+   </property>
+   <property name="color_1">
+    <color>
+     <red>0</red>
+     <green>0</green>
+     <blue>0</blue>
+    </color>
+   </property>
+  </widget>
+  <widget class="caNumeric" name="canumeric">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>15</y>
+     <width>100</width>
+     <height>50</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">$(DEVICE):WIRESCAN-MEAN</string>
+   </property>
+   <property name="precisionMode">
+    <enum>caNumeric::User</enum>
+   </property>
+   <property name="fixedFormat">
+    <bool>true</bool>
+   </property>
+   <property name="maxValue">
+    <double>100.000000000000000</double>
+   </property>
+   <property name="minValue">
+    <double>-100.000000000000000</double>
+   </property>
+  </widget>
+  <widget class="caLabel" name="calabel">
+   <property name="geometry">
+    <rect>
+     <x>15</x>
+     <y>20</y>
+     <width>90</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Mean</string>
+   </property>
+  </widget>
+  <widget class="caNumeric" name="canumeric_2">
+   <property name="geometry">
+    <rect>
+     <x>325</x>
+     <y>15</y>
+     <width>100</width>
+     <height>50</height>
+    </rect>
+   </property>
+   <property name="channel" stdset="0">
+    <string notr="true">$(DEVICE):WIRESCAN-SIGMA</string>
+   </property>
+   <property name="precisionMode">
+    <enum>caNumeric::User</enum>
+   </property>
+   <property name="fixedFormat">
+    <bool>true</bool>
+   </property>
+   <property name="maxValue">
+    <double>100.000000000000000</double>
+   </property>
+   <property name="minValue">
+    <double>0.000000000000000</double>
+   </property>
+  </widget>
+  <widget class="caLabel" name="calabel_2">
+   <property name="geometry">
+    <rect>
+     <x>230</x>
+     <y>20</y>
+     <width>90</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Sigma</string>
+   </property>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caNumeric</class>
+   <extends>QFrame</extends>
+   <header>caNumeric</header>
+  </customwidget>
+  <customwidget>
+   <class>caLabel</class>
+   <extends>QLabel</extends>
+   <header>caLabel</header>
+  </customwidget>
+  <customwidget>
+   <class>caCartesianPlot</class>
+   <extends>QwtPlot</extends>
+   <header>caCartesianPlot</header>
+  </customwidget>
+  <customwidget>
+   <class>QwtPlot</class>
+   <extends>QFrame</extends>
+   <header>qwt_plot.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
