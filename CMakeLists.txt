@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.16)
 project(wirevisual VERSION 1.0.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
 # Profiles
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -20,8 +21,10 @@ execute_process(
     ${CMAKE_SOURCE_DIR}/compile_commands.json
 )
 
-# Enable the Qt Meta Object Compiler (MOC)
+# Enable the Qt specific stuff
 set(CMAKE_AUTOMOC TRUE)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
 
 # Output path
 set(OutputDirectory "${CMAKE_SOURCE_DIR}/bin/${CMAKE_SYSTEM_PROCESSOR}/${CMAKE_BUILD_TYPE}")
@@ -37,10 +40,10 @@ include_directories(/opt/gfa/cafe/cpp/cafe-1.19.2-gcc-7.3.0/include)
 link_directories(/opt/gfa/cafe/cpp/cafe-1.19.2-gcc-7.3.0/lib/RHEL8-x86_64)
 
 # Add epics
-include_directories(/usr/local/epics/base-7.0.6/include)
-include_directories(/usr/local/epics/base-7.0.6/include/os/Linux)
-include_directories(/usr/local/epics/base-7.0.6/include/compiler/gcc)
-link_directories(/usr/local/epics/base-7.0.6/lib/RHEL8-x86_64)
+include_directories(/usr/local/epics/base-7.0.7/include)
+include_directories(/usr/local/epics/base-7.0.7/include/os/Linux)
+include_directories(/usr/local/epics/base-7.0.7/include/compiler/gcc)
+link_directories(/usr/local/epics/base-7.0.7/lib/RHEL8-x86_64)
 
 # Add the subdirectories
 add_subdirectory(forms)

@@ -1,0 +1,639 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1500</width>
+    <height>900</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Wirevisual</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,3">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QListWidget" name="beamline_list">
+            <property name="styleSheet">
+             <string notr="true">display: inline-block;</string>
+            </property>
+            <item>
+             <property name="text">
+              <string>b860</string>
+             </property>
+             <property name="checkState">
+              <enum>Unchecked</enum>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>bce</string>
+             </property>
+             <property name="checkState">
+              <enum>Unchecked</enum>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>bw2</string>
+             </property>
+             <property name="checkState">
+              <enum>Unchecked</enum>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>bx1</string>
+             </property>
+             <property name="checkState">
+              <enum>Unchecked</enum>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>bx2</string>
+             </property>
+             <property name="checkState">
+              <enum>Unchecked</enum>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>ip2</string>
+             </property>
+             <property name="checkState">
+              <enum>Unchecked</enum>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>iw2</string>
+             </property>
+             <property name="checkState">
+              <enum>Unchecked</enum>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>pkbhe</string>
+             </property>
+             <property name="checkState">
+              <enum>Unchecked</enum>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>pksinq</string>
+             </property>
+             <property name="checkState">
+              <enum>Unchecked</enum>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>pktebhe</string>
+             </property>
+             <property name="checkState">
+              <enum>Unchecked</enum>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>pktm</string>
+             </property>
+             <property name="checkState">
+              <enum>Unchecked</enum>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>pktmte</string>
+             </property>
+             <property name="checkState">
+              <enum>Unchecked</enum>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>sinq</string>
+             </property>
+             <property name="checkState">
+              <enum>Unchecked</enum>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>ucn</string>
+             </property>
+             <property name="checkState">
+              <enum>Unchecked</enum>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="measure_button">
+            <property name="styleSheet">
+             <string notr="true">width: 50px;</string>
+            </property>
+            <property name="text">
+             <string>Meausre</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="stop_button">
+            <property name="text">
+             <string>Stop</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="resume_button">
+            <property name="text">
+             <string>Resume</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="transport_button">
+            <property name="text">
+             <string>Transport</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="mint_button">
+            <property name="text">
+             <string>MinT</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="replay_button">
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string>Replay</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="fit_2sigma">
+            <property name="text">
+             <string>2 Sigma</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="fit_2sigmareduced">
+            <property name="text">
+             <string>2 Sigma Reduced</string>
+            </property>
+           </widget>
+          </item>
+          <item alignment="Qt::AlignLeft">
+           <widget class="QRadioButton" name="fit_2sigmafit">
+            <property name="text">
+             <string>2 Sigma Fit</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="fit_fwhm">
+            <property name="text">
+             <string>FWHM</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="fit_fwhm_fit">
+            <property name="text">
+             <string>FWHM Fit</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QListWidget" name="profile_list"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0">
+        <item>
+         <widget class="QScrollArea" name="scrollArea_2">
+          <property name="widgetResizable">
+           <bool>true</bool>
+          </property>
+          <widget class="QWidget" name="scrollAreaWidgetContents_2">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>397</width>
+             <height>827</height>
+            </rect>
+           </property>
+          </widget>
+         </widget>
+        </item>
+        <item>
+         <widget class="QScrollArea" name="scrollArea">
+          <property name="widgetResizable">
+           <bool>true</bool>
+          </property>
+          <widget class="QWidget" name="scrollAreaWidgetContents">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>396</width>
+             <height>827</height>
+            </rect>
+           </property>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="action1">
+   <property name="text">
+    <string>1</string>
+   </property>
+  </action>
+  <action name="action2">
+   <property name="text">
+    <string>2</string>
+   </property>
+  </action>
+  <action name="action4">
+   <property name="text">
+    <string>4</string>
+   </property>
+  </action>
+  <action name="action5">
+   <property name="text">
+    <string>5</string>
+   </property>
+  </action>
+  <action name="action6">
+   <property name="text">
+    <string>6</string>
+   </property>
+  </action>
+  <action name="action7">
+   <property name="text">
+    <string>7</string>
+   </property>
+  </action>
+  <action name="action8">
+   <property name="text">
+    <string>8</string>
+   </property>
+  </action>
+  <action name="action9">
+   <property name="text">
+    <string>9</string>
+   </property>
+  </action>
+  <action name="action0">
+   <property name="text">
+    <string>0</string>
+   </property>
+  </action>
+  <action name="action1_2">
+   <property name="text">
+    <string>1</string>
+   </property>
+  </action>
+  <action name="action2_2">
+   <property name="text">
+    <string>2</string>
+   </property>
+  </action>
+  <action name="action5_2">
+   <property name="text">
+    <string>5</string>
+   </property>
+  </action>
+  <action name="action6_2">
+   <property name="text">
+    <string>6</string>
+   </property>
+  </action>
+  <action name="action1_3">
+   <property name="text">
+    <string>1</string>
+   </property>
+  </action>
+  <action name="action2_3">
+   <property name="text">
+    <string>2</string>
+   </property>
+  </action>
+  <action name="action3">
+   <property name="text">
+    <string>3</string>
+   </property>
+  </action>
+  <action name="action4_2">
+   <property name="text">
+    <string>4</string>
+   </property>
+  </action>
+  <action name="action5_3">
+   <property name="text">
+    <string>5</string>
+   </property>
+  </action>
+  <action name="action6_3">
+   <property name="text">
+    <string>6</string>
+   </property>
+  </action>
+  <action name="action7_2">
+   <property name="text">
+    <string>7</string>
+   </property>
+  </action>
+  <action name="action8_2">
+   <property name="text">
+    <string>8</string>
+   </property>
+  </action>
+  <action name="action9_2">
+   <property name="text">
+    <string>9</string>
+   </property>
+  </action>
+  <action name="action0_2">
+   <property name="text">
+    <string>0</string>
+   </property>
+  </action>
+  <action name="action1_4">
+   <property name="text">
+    <string>1</string>
+   </property>
+  </action>
+  <action name="action2_4">
+   <property name="text">
+    <string>2</string>
+   </property>
+  </action>
+  <action name="action3_2">
+   <property name="text">
+    <string>3</string>
+   </property>
+  </action>
+  <action name="action4_3">
+   <property name="text">
+    <string>4</string>
+   </property>
+  </action>
+  <action name="action5_4">
+   <property name="text">
+    <string>5</string>
+   </property>
+  </action>
+  <action name="action6_4">
+   <property name="text">
+    <string>6</string>
+   </property>
+  </action>
+  <action name="action7_3">
+   <property name="text">
+    <string>7</string>
+   </property>
+  </action>
+  <action name="action8_3">
+   <property name="text">
+    <string>8</string>
+   </property>
+  </action>
+  <action name="action9_3">
+   <property name="text">
+    <string>9</string>
+   </property>
+  </action>
+  <action name="action0_3">
+   <property name="text">
+    <string>0</string>
+   </property>
+  </action>
+  <action name="action1_5">
+   <property name="text">
+    <string>1</string>
+   </property>
+  </action>
+  <action name="action2_5">
+   <property name="text">
+    <string>2</string>
+   </property>
+  </action>
+  <action name="action1_6">
+   <property name="text">
+    <string>1</string>
+   </property>
+  </action>
+  <action name="action2_6">
+   <property name="text">
+    <string>2</string>
+   </property>
+  </action>
+  <action name="action1_7">
+   <property name="text">
+    <string>1</string>
+   </property>
+  </action>
+  <action name="action3_3">
+   <property name="text">
+    <string>3</string>
+   </property>
+  </action>
+  <action name="action4_4">
+   <property name="text">
+    <string>4</string>
+   </property>
+  </action>
+  <action name="action5_5">
+   <property name="text">
+    <string>5</string>
+   </property>
+  </action>
+  <action name="action6_5">
+   <property name="text">
+    <string>6</string>
+   </property>
+  </action>
+  <action name="action7_4">
+   <property name="text">
+    <string>7</string>
+   </property>
+  </action>
+  <action name="action8_4">
+   <property name="text">
+    <string>8</string>
+   </property>
+  </action>
+  <action name="action9_4">
+   <property name="text">
+    <string>9</string>
+   </property>
+  </action>
+  <action name="action0_4">
+   <property name="text">
+    <string>0</string>
+   </property>
+  </action>
+  <action name="action1_8">
+   <property name="text">
+    <string>1</string>
+   </property>
+  </action>
+  <action name="action2_7">
+   <property name="text">
+    <string>2</string>
+   </property>
+  </action>
+  <action name="action3_4">
+   <property name="text">
+    <string>3</string>
+   </property>
+  </action>
+  <action name="action4_5">
+   <property name="text">
+    <string>4</string>
+   </property>
+  </action>
+  <action name="action1_9">
+   <property name="text">
+    <string>1</string>
+   </property>
+  </action>
+  <action name="action2_8">
+   <property name="text">
+    <string>2</string>
+   </property>
+  </action>
+  <action name="action1X">
+   <property name="text">
+    <string>1X</string>
+   </property>
+  </action>
+  <action name="action2Y">
+   <property name="text">
+    <string>2Y</string>
+   </property>
+  </action>
+  <action name="action1_10">
+   <property name="text">
+    <string>1</string>
+   </property>
+  </action>
+  <action name="action2_9">
+   <property name="text">
+    <string>2</string>
+   </property>
+  </action>
+  <action name="action1_11">
+   <property name="text">
+    <string>1</string>
+   </property>
+  </action>
+  <action name="action2_10">
+   <property name="text">
+    <string>2</string>
+   </property>
+  </action>
+  <action name="action3_5">
+   <property name="text">
+    <string>3</string>
+   </property>
+  </action>
+  <action name="action4_6">
+   <property name="text">
+    <string>4</string>
+   </property>
+  </action>
+  <action name="action5_6">
+   <property name="text">
+    <string>5</string>
+   </property>
+  </action>
+  <action name="action6_6">
+   <property name="text">
+    <string>6</string>
+   </property>
+  </action>
+  <action name="action3_6">
+   <property name="text">
+    <string>3</string>
+   </property>
+  </action>
+  <action name="action4_7">
+   <property name="text">
+    <string>4</string>
+   </property>
+  </action>
+  <action name="action5_7">
+   <property name="text">
+    <string>5</string>
+   </property>
+  </action>
+  <action name="action6_7">
+   <property name="text">
+    <string>6</string>
+   </property>
+  </action>
+  <action name="action5_8">
+   <property name="text">
+    <string>5</string>
+   </property>
+  </action>
+  <action name="action6_8">
+   <property name="text">
+    <string>6</string>
+   </property>
+  </action>
+  <action name="action7_5">
+   <property name="text">
+    <string>7</string>
+   </property>
+  </action>
+  <action name="action8_5">
+   <property name="text">
+    <string>8</string>
+   </property>
+  </action>
+  <action name="action9_5">
+   <property name="text">
+    <string>9</string>
+   </property>
+  </action>
+  <action name="action0_5">
+   <property name="text">
+    <string>0</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -1,15 +1,14 @@
 record(ao, "$(DEVICE):INP-A") {
     field(PREC, "3")
     field(PINI, "YES")    
-    field(FLNK, "$(DEVICE):INP-RES")        
+    field(FLNK, "$(DEVICE):INP-RES")
 }
 
 record(ao, "$(DEVICE):INP-B") {
     field(PREC, "3")
     field(PINI, "YES")    
-    field(FLNK, "$(DEVICE):INP-RES")        
+    field(FLNK, "$(DEVICE):INP-RES")
 }
-
 
 record(calc, "$(DEVICE):INP-RES") {
     field(CALC, "a+b")

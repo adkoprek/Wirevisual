@@ -1,3 +1,5 @@
 add_library(libwirevisual
-    test.cpp
+    data_fetch.cpp
+    data_fetch.h
+    data_point.h
 )
