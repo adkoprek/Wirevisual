@@ -6,6 +6,6 @@
 
 typedef struct DataPoint {
     std::string name;
-    std::vector<float>* x;
-    std::vector<float>* y;
+    std::vector<double> x;
+    std::vector<double> y;
 } DataPoint;

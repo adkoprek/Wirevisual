@@ -6,7 +6,7 @@
 #include <vector>
 
 
-typedef std::vector<float> data_vector;
+typedef std::vector<double> data_vector;
 
 class ProfileFetch {
 public:
@@ -19,6 +19,7 @@ private:
     std::string m_current_profile;
 
     int activate_scan();
+    bool scan_finished();
     int16_t get_size_of_profile();
-    int load_profile_data(int16_t size, data_vector* x_data, data_vector* y_data);
+    int load_profile_data(double* x_data, double* y_data);
 };
