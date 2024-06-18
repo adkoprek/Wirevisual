@@ -5,6 +5,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
+# Remove the lib prefix from libs, adding it manualy
+set(CMAKE_STATIC_LIBRARY_PREFIX "")
+
 # Profiles
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message("Setting build type to 'RelWithDebInfo' as none was specified.")
@@ -64,7 +67,6 @@ add_executable(wirevisual
 # Add the include files to avoid relative paths
 target_include_directories(wirevisual PRIVATE src/app)
 target_include_directories(wirevisual PRIVATE forms)
-target_include_directories(libwirevisual PUBLIC include)
 
 # Link Epics Chanel Acess to custom lib
 target_link_libraries(libwirevisual ca)
