@@ -2,8 +2,8 @@
 #include "src/logic/data_fetch.h"
 #include <QApplication>
 #include <chrono>
-#include <cstdint>
 #include <iostream>
+#include <string>
 #include <thread>
 #include <vector>
 
@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
 int test_data_fetch() {
     // Create a DataFetch instance
     DataFetch data_fetch;
-    std::vector<uint8_t> to_fetch = { 0, 1, 2, 3, 4, 5 };
+    std::vector<std::string> to_fetch = { "test" };
 
     // Start the thread
     std::thread fethcing(&DataFetch::fetch, &data_fetch, to_fetch);
