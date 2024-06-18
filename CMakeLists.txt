@@ -45,6 +45,10 @@ include_directories(/usr/local/epics/base-7.0.7/include/os/Linux)
 include_directories(/usr/local/epics/base-7.0.7/include/compiler/gcc)
 link_directories(/usr/local/epics/base-7.0.7/lib/RHEL8-x86_64)
 
+# Add QWT
+include_directories(/usr/include/qt5/qwt/)
+link_directories(/usr/lib64)
+
 # Add the subdirectories
 add_subdirectory(forms)
 add_subdirectory(src/app)
@@ -67,6 +71,9 @@ target_link_libraries(libwirevisual ca)
 
 # Link cafe with custom lib
 target_link_libraries(libwirevisual cafe)
+
+# Link QWT with custom lib
+target_link_libraries(libwirevisual qwt-qt5)
 
 # Link Qt5 and custom lib to the main executable 
 target_link_libraries(wirevisual PRIVATE Qt5::Widgets)

@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <cstddef>
 #include <iterator>
-#include <qlistwidget.h>
+#include <QListWidget>
 #include <qnamespace.h>
 #include <string>
 
@@ -43,6 +43,7 @@ void MainWindow::on_beamline_clicked(QListWidgetItem* item) {
 }
 
 void MainWindow::on_beamline_selected(QListWidgetItem* item) {
+    ui.beamline_list->setCurrentItem(item);
     std::string selected_item(item->text().toUtf8().constData());
     auto profiles_to_display = &profiles.at(selected_item);
     
