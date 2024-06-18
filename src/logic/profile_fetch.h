@@ -18,6 +18,7 @@ private:
     CAFE* m_cafe;
     std::string m_current_profile;
 
+    int activate_scan();
     int16_t get_size_of_profile();
     int load_profile_data(int16_t size, data_vector* x_data, data_vector* y_data);
 };

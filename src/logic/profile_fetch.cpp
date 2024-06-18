@@ -1,6 +1,6 @@
 #include "data_point.h"
 #include "epics_commands.h"
-#include "profil_fetch.h"
+#include "profile_fetch.h"
 #include "cafe.h"
 #include <cstdint>
 #include <iostream>
