@@ -22,8 +22,6 @@
 #include <vector>
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
-#include <qwt_legend.h>
-#include <qwt_plot_zoomer.h>
 
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
@@ -189,19 +187,7 @@ void MainWindow::measure() {
 }
 
 void MainWindow::create_diagrams() {
-    while (auto item = m_diagram_layout_1->takeAt(0)) {
-        auto widget = item->widget();
-        widget->setParent(nullptr);
-        delete widget;
-        delete item;
-    }
-
-    while (auto item = m_diagram_layout_2->takeAt(0)) {
-        auto widget = item->widget();
-        widget->setParent(nullptr);
-        delete widget;
-        delete item;
-    }
+    while (QLayout)
 
     m_busy = false;
     std::vector<std::string> failed_profiles;
@@ -213,7 +199,6 @@ void MainWindow::create_diagrams() {
 
         if (point->valid_data) {
             plot->setTitle(QString(point->name.c_str()));
-            plot->insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
 
             QwtPlotCurve* curve_real = new QwtPlotCurve("Curve x");
             curve_real->setSamples(point->x.data(), point->y.data(), static_cast<int>(point->x.size()));
@@ -224,8 +209,6 @@ void MainWindow::create_diagrams() {
             plot->setTitle(QString((point->name + " - Corrupted").c_str()));
             failed_profiles.push_back(point->name);
         } 
-
-        QwtPlotZoomer* zoomer = new QwtPlotZoomer(plot->canvas());
 
         plot->replot();
 
@@ -252,7 +235,7 @@ void MainWindow::create_diagrams() {
 }
 
 void MainWindow::reset_beamlines() {
-    for (size_t i = 0; i < BEAM_LINES.size(); i++) {
+    for (size_t i = 0; i < 12; i++) {
         ui.beamline_list->item(i)->setCheckState(Qt::Unchecked);
     }
 }

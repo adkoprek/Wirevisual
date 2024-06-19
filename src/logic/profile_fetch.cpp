@@ -3,14 +3,16 @@
 #include "profile_fetch.h"
 #include "cafe.h"
 #include <boost/numeric/conversion/detail/meta.hpp>
+#include <cmath>
 #include <cstdint>
+#include <cstring>
 #include <iostream>
 #include <string>
 #include <vector>
-#include <chrono>
-#include <thread>
 
-#define PRODUCTION 1
+
+#define DEBUG 1
+
 
 ProfileFetch::ProfileFetch() {
     m_cafe = new CAFE();
@@ -24,25 +26,45 @@ ProfileFetch::~ProfileFetch() {
 
 int ProfileFetch::fetch(std::string profile_name, DataPoint* profile) {
     m_current_profile = profile_name;
+    profile->name = profile_name;
+    profile->valid_data = false;
 
-#ifdef PRODUCTION 
+#ifndef DEBUG
     activate_scan();
-    while (!scan_finished())
+    char i = 0;
+    while (i < 50) {
+        if (scan_finished()) 
+            break;
+
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
-#endif // PRODUCTION
+        i++;
+    }
+
+    if (i > 50)
+        return -1;
+#endif // !DEBUG 
     
 
     auto size = get_size_of_profile(); 
-    if (size == -1) return -1;
+    if (size == -1) 
+        return -2;
+#ifdef DEBUG 
+    std::cout << "The of the profile size is: " << size << std::endl;
+#endif // DEBUG
         
     double x_data[size];
     double y_data[size];
     auto return_code = load_profile_data(x_data, y_data);
-    if (return_code != 0) return -2;
+    if (return_code != 0)
+        return -3;
+   round_data(size, x_data, y_data);
 
-    profile->name = profile_name;
+#ifdef DEBUG 
+    std::cout << "Profile \"" << profile_name << "\" was executed correctly" << std::endl;
+#endif // DEBUG
     profile->x = std::vector<double>(x_data, x_data + size);
     profile->y = std::vector<double>(y_data, y_data + size);
+    profile->valid_data = true;
 
     return 0;
 }
@@ -93,7 +115,6 @@ int16_t ProfileFetch::get_size_of_profile() {
 int ProfileFetch::load_profile_data(double* x_data, double* y_data) {
     std::vector<unsigned int> handles;
 
-
     std::string command_x = m_current_profile + PROFILE_PV_X;
     std::vector<std::string> pvs_x = { command_x };
     std::string command_y = m_current_profile + PROFILE_PV_Y;
@@ -115,4 +136,11 @@ int ProfileFetch::load_profile_data(double* x_data, double* y_data) {
     }
 
     return 0;
+}
+
+void ProfileFetch::round_data(int16_t size, double* x_data, double* y_data) {
+    for (int16_t i = 0; i < size; i++) {
+        x_data[i] = std::round(x_data[i] * 1000) / 1000;
+        y_data[i] = std::round(y_data[i] * 1000) / 1000;
+    }
 }

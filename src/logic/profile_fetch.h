@@ -22,4 +22,5 @@ private:
     bool scan_finished();
     int16_t get_size_of_profile();
     int load_profile_data(double* x_data, double* y_data);
+    void round_data(int16_t size, double* x_data, double* y_data);
 };

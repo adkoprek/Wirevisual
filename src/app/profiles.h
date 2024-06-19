@@ -5,7 +5,12 @@
 #include <vector>
 
 
-const std::map<std::string, std::vector<std::string>> profiles {
+const std::vector<std::string> BEAM_LINES {
+    "b860", "bce", "bw2", "bx1", "bx2", "ip2", "iw2", "pkbhe", 
+    "pksinq", "pktebhe", "pktm", "pktmte", "sinq", "unc"
+};
+
+const std::map<std::string, std::vector<std::string>> PROFILES {
     {"b860", {
             "MWL01", "MWL02", "MWL04", "MWL05",
             "MWL06", "MWL07", "MWL08", "MWL09",
@@ -116,8 +121,8 @@ const std::map<std::string, std::vector<std::string>> profiles {
         }
     },
     {"sinq", {
-            "MWP41", "MHP42", "MHP43", "MHP44", 
-            "MWP46", "MHP47", "MHP48", "MHP49", 
+            "MHP41", "MHP42", "MHP43", "MHP44", 
+            "MHP46", "MHP47", "MHP48", "MHP49", 
             "MHP50", "MHP51", "MHP52", "MHP53", 
             "MHP54", "MHP55", "MHP56", "MHP57", 
             "MHP58",

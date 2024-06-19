@@ -37,6 +37,7 @@ private:
     void custom_ui_setup();
     void measure();
     void reset_beamlines();
+    void add_profile(std::string beam_line, std::string profile);
     
     Ui::MainWindow ui;
     DataFetch* m_data_fetch;

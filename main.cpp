@@ -11,8 +11,7 @@
 int test_data_fetch();
 
 int main(int argc, char* argv[]) {
-    test_data_fetch();
-    return 0;
+    // test_data_fetch();
 
     QApplication app(argc, argv);
     MainWindow w;
@@ -32,7 +31,7 @@ int test_data_fetch() {
 
     DataPoint* point = data_fetch.get_data_point("MHP11");
     for (size_t i = 0; i < point->y.size(); i++) {
-        std::cout << point->y[i];
+        std::cout << point->y[i] << " ";
     }
 
     return 0;
