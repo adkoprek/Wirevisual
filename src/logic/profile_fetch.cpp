@@ -50,7 +50,7 @@ int ProfileFetch::fetch(std::string profile_name, DataPoint* profile) {
 int ProfileFetch::activate_scan() {
     std::string command = m_current_profile + PV_ACTIVATE_SCAN;
 
-    int status = m_cafe->set(m_current_profile.c_str(), START_COMMAND.c_str());
+    int status = m_cafe->set(command.c_str(), START_COMMAND.c_str());
     if (status != ICAFE_NORMAL) {
         std::cerr << "An error occured while starting the wirescan for the profile \"" <<
             m_current_profile << "\"" << std::endl;
@@ -64,7 +64,7 @@ bool ProfileFetch::scan_finished() {
     std::string profile_status;
 
     std::string command = m_current_profile + PROFILE_PV_STATUS;
-    int status = m_cafe->get(command.c_str(), status);
+    int status = m_cafe->get(command.c_str(), profile_status);
     if (status != ICAFE_NORMAL) {
         std::cerr << "An error occured while fetching the size of the profile \"" <<
             m_current_profile << "\"" << std::endl;
