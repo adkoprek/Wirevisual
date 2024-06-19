@@ -41,7 +41,6 @@ void DataFetch::fetch(std::vector<std::string> profiles) {
     }
 
     data_ready = true;
-    cv_data_ready.notify_all();
 }
 
 void DataFetch::stop() {
@@ -51,7 +50,7 @@ void DataFetch::stop() {
 
 void DataFetch::resume() {
     std::lock_guard<std::mutex> lock(m_mu); 
-    m_stop_flag = false;;
+    m_stop_flag = false;
     m_cv_internal.notify_one();
 }
 

@@ -66,6 +66,7 @@ add_executable(wirevisual
 
 # Add the include files to avoid relative paths
 target_include_directories(wirevisual PRIVATE src/app)
+target_include_directories(wirevisual PRIVATE src/logic)
 target_include_directories(wirevisual PRIVATE forms)
 
 # Link Epics Chanel Acess to custom lib
@@ -74,9 +75,7 @@ target_link_libraries(libwirevisual ca)
 # Link cafe with custom lib
 target_link_libraries(libwirevisual cafe)
 
-# Link QWT with custom lib
-target_link_libraries(libwirevisual qwt-qt5)
-
-# Link Qt5 and custom lib to the main executable 
+# Link Qt5, QWT and custom lib to the main executable 
 target_link_libraries(wirevisual PRIVATE Qt5::Widgets)
-target_link_libraries(wirevisual PUBLIC libwirevisual)
+target_link_libraries(wirevisual PRIVATE qwt-qt5)
+target_link_libraries(wirevisual PRIVATE libwirevisual)

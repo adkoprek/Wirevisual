@@ -16,7 +16,6 @@ public:
 
 public:
     bool data_ready = false;
-    std::condition_variable cv_data_ready;
 
     void fetch(std::vector<std::string> profiles);
     void stop();

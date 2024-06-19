@@ -7,7 +7,10 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <chrono>
+#include <thread>
 
+#define PRODUCTION 1
 
 ProfileFetch::ProfileFetch() {
     m_cafe = new CAFE();
@@ -23,11 +26,8 @@ int ProfileFetch::fetch(std::string profile_name, DataPoint* profile) {
     m_current_profile = profile_name;
 
 #ifdef PRODUCTION 
-    #include <chrono>
-    #include <thread>
-    
     activate_scan();
-    while (scan_finished())
+    while (!scan_finished())
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
 #endif // PRODUCTION
     
@@ -38,7 +38,6 @@ int ProfileFetch::fetch(std::string profile_name, DataPoint* profile) {
     double x_data[size];
     double y_data[size];
     auto return_code = load_profile_data(x_data, y_data);
-    std::cout << "Some data: " << x_data[399] << std::endl;
     if (return_code != 0) return -2;
 
     profile->name = profile_name;
