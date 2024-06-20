@@ -1,4 +1,6 @@
 set(APP_SRC_FILES 
+    src/app/loading_widget.h
+    src/app/loading_widget.cpp
     src/app/mainwindow.h
     src/app/mainwindow.cpp
     src/app/worker.cpp

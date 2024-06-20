@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "data_fetch.h"
+#include "loading_widget.h"
 #include "profiles.h"
 #include "worker.h"
 #include <QWidget>
@@ -11,6 +12,7 @@
 #include <QThread>
 #include <iterator>
 #include <QListWidget>
+#include <qcoreevent.h>
 #include <qlist.h>
 #include <qmessagebox.h>
 #include <qnamespace.h>
@@ -35,6 +37,7 @@ MainWindow::~MainWindow() {
     delete m_data_fetch;
     delete m_diagram_layout_1;
     delete m_diagram_layout_2;
+    delete m_loading_overlay;
 }
 
 void MainWindow::custom_ui_setup() {
@@ -61,6 +64,27 @@ void MainWindow::custom_ui_setup() {
     auto widget2 = new QWidget();
     widget2->setLayout(m_diagram_layout_2);
     ui.scrollArea_2->setWidget(widget2);
+
+    create_overlay();
+}
+
+void MainWindow::create_overlay() {
+    m_loading_overlay = new QWidget(this);
+    m_loading_overlay->setGeometry(this->geometry());
+    m_loading_overlay->setStyleSheet("background-color: rgba(0, 0, 0, 0.5)");
+    auto loading_layout = new QGridLayout();
+    m_loading_overlay->setLayout(loading_layout);
+
+    auto overlay = new LoadingWidget(); 
+    overlay->set_text("Loading");
+    overlay->start();
+    loading_layout->addWidget(overlay);
+
+    m_loading_overlay->hide();
+}
+
+void MainWindow::resizeEvent(QResizeEvent* event) {
+    m_loading_overlay->setGeometry(QRect(0, 0, this->width(), this->height()));
 }
 
 void MainWindow::on_beamline_clicked(QListWidgetItem* item) {
@@ -135,6 +159,8 @@ void MainWindow::on_profile_selected(QListWidgetItem* item) {
 }
 
 void MainWindow::on_measure_clicked() {
+    if (m_busy) return;
+    if (!m_selected.size()) return;
     m_to_fetch.clear();
     for (int i = 0; i < m_selected.size(); i++) {
         std::stringstream ss(m_selected[i]);
@@ -186,8 +212,8 @@ void MainWindow::on_replay_clicked() {
 }
 
 void MainWindow::measure() {
-    if (m_busy) return;
     m_busy = true;
+    m_loading_overlay->show();
 
     m_work_tread = new QThread();
     m_worker = new Worker([this]{ m_data_fetch->fetch(m_to_fetch); });
@@ -222,7 +248,6 @@ void MainWindow::create_diagrams() {
         delete item;
     }
 
-    m_busy = false;
     std::vector<std::string> failed_profiles;
 
     for (int i = m_to_fetch.size() - 1; i > -1; i--) {
@@ -266,8 +291,11 @@ void MainWindow::create_diagrams() {
         QMessageBox* message_box = new QMessageBox();
         message_box->setText(QString(message.c_str()));
         message_box->setStandardButtons(QMessageBox::Ok);
+        m_loading_overlay->hide();
         message_box->exec();
     }
+    m_loading_overlay->hide();
+    m_busy = false;
 }
 
 void MainWindow::reset_beamlines() {

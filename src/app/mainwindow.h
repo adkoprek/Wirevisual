@@ -4,6 +4,7 @@
 #include <qobjectdefs.h>
 #include <QVBoxLayout>
 #include <qthread.h>
+#include <qwidget.h>
 #include <string>
 #include <vector>
 #include "data_fetch.h"
@@ -36,6 +37,8 @@ public slots:
 
 private:
     void custom_ui_setup();
+    void create_overlay();
+    void resizeEvent(QResizeEvent* event);
     void measure();
     void reset_beamlines();
     void add_profile(std::string beam_line, std::string profile);
@@ -50,5 +53,6 @@ private:
     QVBoxLayout* m_diagram_layout_2;
     QThread* m_work_tread = nullptr;
     Worker* m_worker;
+    QWidget* m_loading_overlay;
 };
 
