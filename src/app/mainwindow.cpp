@@ -143,7 +143,9 @@ void MainWindow::on_measure_clicked() {
         while (getline(ss, part, '/')) {
             if (count == 1) {
                 auto index = std::find(m_to_fetch.begin(), m_to_fetch.end(), part);
-                if (index == m_to_fetch.end()) m_to_fetch.push_back(part);
+                if (index == m_to_fetch.end()) {
+                    m_to_fetch.push_back(part);
+                }
             }
             count++;
         }
@@ -151,14 +153,13 @@ void MainWindow::on_measure_clicked() {
     m_selected.clear();
     reset_beamlines();
 
-    std::cout << "I'm measuring!" << std::endl;;
-
     measure();
 }
 
 void MainWindow::on_cancel_clicked() {
     if (!m_busy) return;
     m_data_fetch->cancel();
+    m_data_fetch->resume();
 }
 
 void MainWindow::on_stop_clicked() {
@@ -201,7 +202,6 @@ void MainWindow::create_diagrams() {
     m_work_tread->quit();
     m_work_tread->wait();
     delete m_work_tread;
-    // ToDo: Delete the Qthread
 
     if (m_data_fetch->was_canceled()) {
         m_busy = false;
@@ -274,7 +274,7 @@ void MainWindow::reset_beamlines() {
     for (size_t i = 0; i < BEAM_LINES.size(); i++) {
         ui.beamline_list->item(i)->setCheckState(Qt::Unchecked);
     }
-    on_beamline_clicked(ui.beamline_list->item(0));
+    on_beamline_clicked(ui.beamline_list->currentItem());
 }
 
 void MainWindow::add_profile(std::string beam_line, std::string profile) {

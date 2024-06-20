@@ -44,10 +44,8 @@ void DataFetch::fetch(std::vector<std::string> profiles) {
         if (return_code != 0)
             std::cerr << "An error occured while fetching profile \"" << profiles[i] << 
                 "\", the function exited with error code " << return_code << std::endl;
-        if (m_data_points.count(profiles[i]))
-            m_data_points[profiles[i]] = profile;
-        else
-            m_data_points.insert({ profiles[i], profile });
+        
+        m_data_points.insert({ profiles[i], profile });
     }
 
     data_ready = true;
@@ -63,7 +61,6 @@ void DataFetch::resume() {
     m_stop_flag = false;
     m_cv_internal.notify_one();
 }
-
 
 void DataFetch::cancel() {
     std::lock_guard<std::mutex> lock(m_mu); 

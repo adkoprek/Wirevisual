@@ -49,7 +49,7 @@ int ProfileFetch::fetch(std::string profile_name, DataPoint* profile) {
     if (size == -1) 
         return -2;
 #ifdef DEBUG 
-    std::cout << "The of the profile size is: " << size << std::endl;
+    std::cout << "The size of the profile size: " << size << std::endl;
 #endif // DEBUG
         
     double x_data[size];
@@ -57,7 +57,9 @@ int ProfileFetch::fetch(std::string profile_name, DataPoint* profile) {
     auto return_code = load_profile_data(x_data, y_data);
     if (return_code != 0)
         return -3;
-   round_data(size, x_data, y_data);
+
+    round_data(size, x_data, y_data);
+
 
 #ifdef DEBUG 
     std::cout << "Profile \"" << profile_name << "\" was executed correctly" << std::endl;
@@ -122,6 +124,7 @@ int ProfileFetch::load_profile_data(double* x_data, double* y_data) {
 
     m_cafe->open(pvs_x, handles);
     int status = m_cafe->get(command_x.c_str(), x_data);
+    m_cafe->closeHandlesV(handles);
     if (status != ICAFE_NORMAL) {
         std::cerr << "An error occured while fetching the x data of the profile \"" <<
             m_current_profile << "\"" << std::endl;
@@ -129,6 +132,7 @@ int ProfileFetch::load_profile_data(double* x_data, double* y_data) {
     }
     m_cafe->open(pvs_y, handles);
     status = m_cafe->get(command_y.c_str(), y_data);
+    m_cafe->closeHandlesV(handles);
     if (status != ICAFE_NORMAL) {
         std::cerr << "An error occured while fetching the y data of the profile \"" <<
             m_current_profile << "\"" << std::endl;
