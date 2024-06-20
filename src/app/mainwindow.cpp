@@ -70,21 +70,23 @@ void MainWindow::custom_ui_setup() {
 
 void MainWindow::create_overlay() {
     m_loading_overlay = new QWidget(this);
-    m_loading_overlay->setGeometry(this->geometry());
+    int offset = ui.beamline_list->width() * 2;
+    m_loading_overlay->setGeometry(QRect(offset, 0, this->width() - offset , this->height()));
     m_loading_overlay->setStyleSheet("background-color: rgba(0, 0, 0, 0.5)");
     auto loading_layout = new QGridLayout();
     m_loading_overlay->setLayout(loading_layout);
 
-    auto overlay = new LoadingWidget(); 
-    overlay->set_text("Loading");
-    overlay->start();
-    loading_layout->addWidget(overlay);
+    m_loading_widget = new LoadingWidget(); 
+    m_loading_widget->set_text("Loading the profiles");
+    m_loading_widget->start();
+    loading_layout->addWidget(m_loading_widget);
 
     m_loading_overlay->hide();
 }
 
 void MainWindow::resizeEvent(QResizeEvent* event) {
-    m_loading_overlay->setGeometry(QRect(0, 0, this->width(), this->height()));
+    int offset = ui.beamline_list->width() * 2;
+    m_loading_overlay->setGeometry(QRect(offset, 0, this->width() - offset , this->height()));
 }
 
 void MainWindow::on_beamline_clicked(QListWidgetItem* item) {
@@ -184,18 +186,24 @@ void MainWindow::on_measure_clicked() {
 
 void MainWindow::on_cancel_clicked() {
     if (!m_busy) return;
+    m_loading_widget->set_text("Canceling");
+    m_loading_widget->stop();
     m_data_fetch->cancel();
     m_data_fetch->resume();
 }
 
 void MainWindow::on_stop_clicked() {
     if (!m_busy) return;
+    m_loading_widget->set_text("Stoped, tap resume to continue");
+    m_loading_widget->stop();
     m_data_fetch->stop();
 }
 
 void MainWindow::on_resume_clicked() {
     if (!m_busy) return;
     m_data_fetch->resume();
+    m_loading_widget->set_text("Loading the profiles");
+    m_loading_widget->start();
 }
 
 void MainWindow::on_transport_clicked() {
@@ -213,6 +221,8 @@ void MainWindow::on_replay_clicked() {
 
 void MainWindow::measure() {
     m_busy = true;
+    m_loading_widget->set_text("Loading the profiles");
+    m_loading_widget->start();
     m_loading_overlay->show();
 
     m_work_tread = new QThread();
@@ -229,10 +239,14 @@ void MainWindow::create_diagrams() {
     m_work_tread->wait();
     delete m_work_tread;
 
+    m_loading_widget->set_text("Createing the diagrams");
+
     if (m_data_fetch->was_canceled()) {
+        m_loading_overlay->hide();
         m_busy = false;
         return;
     }
+
 
     while (auto item = m_diagram_layout_1->takeAt(0)) {
         auto widget = item->widget();

@@ -9,6 +9,7 @@
 #include <vector>
 #include "data_fetch.h"
 #include "../../forms/ui_mainwindow.h"
+#include "loading_widget.h"
 #include "worker.h"
 
 
@@ -54,5 +55,6 @@ private:
     QThread* m_work_tread = nullptr;
     Worker* m_worker;
     QWidget* m_loading_overlay;
+    LoadingWidget* m_loading_widget;
 };
 
