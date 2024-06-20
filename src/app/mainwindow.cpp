@@ -33,6 +33,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 
 MainWindow::~MainWindow() {
     delete m_data_fetch;
+    delete m_diagram_layout_1;
+    delete m_diagram_layout_2;
 }
 
 void MainWindow::custom_ui_setup() {
@@ -149,18 +151,23 @@ void MainWindow::on_measure_clicked() {
     m_selected.clear();
     reset_beamlines();
 
+    std::cout << "I'm measuring!" << std::endl;;
+
     measure();
 }
 
 void MainWindow::on_cancel_clicked() {
+    if (!m_busy) return;
     m_data_fetch->cancel();
 }
 
 void MainWindow::on_stop_clicked() {
+    if (!m_busy) return;
     m_data_fetch->stop();
 }
 
 void MainWindow::on_resume_clicked() {
+    if (!m_busy) return;
     m_data_fetch->resume();
 }
 
@@ -173,6 +180,7 @@ void MainWindow::on_mint_clicked() {
 }
 
 void MainWindow::on_replay_clicked() {
+    if (m_busy) return;
     measure();
 }
 
@@ -180,15 +188,26 @@ void MainWindow::measure() {
     if (m_busy) return;
     m_busy = true;
 
-    QThread* thread = new QThread();
-    Worker* worker = new Worker([this]{ m_data_fetch->fetch(m_to_fetch); });
-    worker->moveToThread(thread);
-    connect(thread, &QThread::started, worker, &Worker::execute_work);
-    connect(worker, &Worker::work_done, this, &MainWindow::create_diagrams, Qt::QueuedConnection);
-    thread->start();
+    m_work_tread = new QThread();
+    m_worker = new Worker([this]{ m_data_fetch->fetch(m_to_fetch); });
+    m_worker->moveToThread(m_work_tread);
+    connect(m_work_tread, &QThread::started, m_worker, &Worker::execute_work);
+    connect(m_worker, &Worker::work_done, this, &MainWindow::create_diagrams, Qt::QueuedConnection);
+    m_work_tread->start();
 }
 
 void MainWindow::create_diagrams() {
+    delete m_worker;
+    m_work_tread->quit();
+    m_work_tread->wait();
+    delete m_work_tread;
+    // ToDo: Delete the Qthread
+
+    if (m_data_fetch->was_canceled()) {
+        m_busy = false;
+        return;
+    }
+
     while (auto item = m_diagram_layout_1->takeAt(0)) {
         auto widget = item->widget();
         widget->setParent(nullptr);
@@ -255,6 +274,7 @@ void MainWindow::reset_beamlines() {
     for (size_t i = 0; i < BEAM_LINES.size(); i++) {
         ui.beamline_list->item(i)->setCheckState(Qt::Unchecked);
     }
+    on_beamline_clicked(ui.beamline_list->item(0));
 }
 
 void MainWindow::add_profile(std::string beam_line, std::string profile) {

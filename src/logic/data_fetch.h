@@ -21,10 +21,12 @@ public:
     void stop();
     void resume();
     void cancel();
+    bool was_canceled();
     DataPoint* get_data_point(std::string profile);
 
 private:
     bool m_stop_flag = false;
+    bool m_last_canceled = false;
     bool m_cancel_flag = false;
     std::condition_variable m_cv_internal;
     std::map<std::string, DataPoint*> m_data_points;

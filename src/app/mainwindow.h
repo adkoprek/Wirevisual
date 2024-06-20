@@ -3,11 +3,12 @@
 #include <qlistwidget.h>
 #include <qobjectdefs.h>
 #include <QVBoxLayout>
+#include <qthread.h>
 #include <string>
-#include <thread>
 #include <vector>
 #include "data_fetch.h"
 #include "../../forms/ui_mainwindow.h"
+#include "worker.h"
 
 
 class MainWindow : public QMainWindow
@@ -47,6 +48,7 @@ private:
     bool m_busy = false;
     QVBoxLayout* m_diagram_layout_1;
     QVBoxLayout* m_diagram_layout_2;
-    std::thread m_worker;
+    QThread* m_work_tread = nullptr;
+    Worker* m_worker;
 };
 

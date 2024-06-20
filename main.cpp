@@ -12,6 +12,7 @@ int test_data_fetch();
 
 int main(int argc, char* argv[]) {
     // test_data_fetch();
+    // return 0;
 
     QApplication app(argc, argv);
     MainWindow w;
