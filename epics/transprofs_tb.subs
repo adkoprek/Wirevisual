@@ -1,9 +1,0 @@
-file transprofs_tb.template {
-  pattern { DEVICE}
-  	  { "$(DEVICE)"}
-}
-
-file transprofs_wirescan.template {
-  pattern { DEVICE}
-  	  { "$(DEVICE)"}
-}

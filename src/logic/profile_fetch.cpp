@@ -8,10 +8,11 @@
 #include <cstring>
 #include <iostream>
 #include <string>
+#include <thread>
 #include <vector>
+#include <chrono>
 
 
-#define DEBUG 1
 
 
 ProfileFetch::ProfileFetch() {
@@ -30,18 +31,20 @@ int ProfileFetch::fetch(std::string profile_name, DataPoint* profile) {
     profile->valid_data = false;
 
 #ifndef DEBUG
-    activate_scan();
-    char i = 0;
-    while (i < 50) {
-        if (scan_finished()) 
-            break;
+    if (profile_name[2] != 'H') {
+        activate_scan();
+        char i = 0;
+        while (i < 50) {
+            if (scan_finished()) 
+                break;
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        i++;
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            i++;
+        }
+
+        if (i > 50)
+            return -1;
     }
-
-    if (i > 50)
-        return -1;
 #endif // !DEBUG 
     
 
@@ -119,7 +122,11 @@ int ProfileFetch::load_profile_data(double* x_data, double* y_data) {
 
     std::string command_x = m_current_profile + PROFILE_PV_X;
     std::vector<std::string> pvs_x = { command_x };
-    std::string command_y = m_current_profile + PROFILE_PV_Y;
+    std::string command_y;
+    if (m_current_profile[2] == 'H') 
+        command_y = m_current_profile + HARP_PV_Y;
+    else 
+        command_y = m_current_profile + PROFILE_PV_Y;
     std::vector<std::string> pvs_y = { command_y };
 
     m_cafe->open(pvs_x, handles);
@@ -130,6 +137,7 @@ int ProfileFetch::load_profile_data(double* x_data, double* y_data) {
             m_current_profile << "\"" << std::endl;
         return -1;
     }
+
     m_cafe->open(pvs_y, handles);
     status = m_cafe->get(command_y.c_str(), y_data);
     m_cafe->closeHandlesV(handles);
