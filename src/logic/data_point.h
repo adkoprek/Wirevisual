@@ -9,4 +9,5 @@ typedef struct DataPoint {
     std::string name;
     std::vector<double> x;
     std::vector<double> y;
+    std::vector<double> fit;
 } DataPoint;

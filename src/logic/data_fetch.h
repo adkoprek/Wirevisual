@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include "data_point.h"
+#include "profile_analyze.h"
 #include "profile_fetch.h"
 
 
@@ -32,4 +33,5 @@ private:
     std::map<std::string, DataPoint*> m_data_points;
     std::mutex m_mu;
     ProfileFetch* m_profile_fetch;
+    ProfileAnalyze* m_profile_analyze;
 };

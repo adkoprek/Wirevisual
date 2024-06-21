@@ -273,10 +273,16 @@ void MainWindow::create_diagrams() {
             plot->setTitle(QString(point->name.c_str()));
             plot->insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
 
-            QwtPlotCurve* curve_real = new QwtPlotCurve("Curve x");
+            QwtPlotCurve* curve_real = new QwtPlotCurve("Curve 1");
             curve_real->setSamples(point->x.data(), point->y.data(), static_cast<int>(point->x.size()));
             curve_real->setTitle("Measured Data");
             curve_real->attach(plot);
+
+            QwtPlotCurve* curve_fit = new QwtPlotCurve("Curve 2");
+            curve_fit->setSamples(point->x.data(), point->fit.data(), static_cast<int>(point->x.size()));
+            curve_fit->setTitle("Fitted Data");
+            curve_fit->setPen(QPen(Qt::red));
+            curve_fit->attach(plot);
         }
         else {
             plot->setTitle(QString((point->name + " - Corrupted").c_str()));

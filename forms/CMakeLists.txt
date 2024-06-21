@@ -1,6 +1,6 @@
 set(UI_FILES
     forms/mainwindow.ui
-    forms/loading_widget.ui
+    forms/loading.ui
     PARENT_SCOPE
 )
 

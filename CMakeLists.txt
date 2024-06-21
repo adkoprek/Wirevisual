@@ -52,6 +52,9 @@ link_directories(/usr/local/epics/base-7.0.7/lib/RHEL8-x86_64)
 include_directories(/usr/include/qt5/qwt/)
 link_directories(/usr/lib64)
 
+# Get GSL
+find_package(GSL REQUIRED)
+
 # Add the subdirectories
 add_subdirectory(forms)
 add_subdirectory(src/app)
@@ -70,10 +73,13 @@ target_include_directories(wirevisual PRIVATE src/logic)
 target_include_directories(wirevisual PRIVATE forms)
 
 # Link Epics Chanel Acess to custom lib
-target_link_libraries(libwirevisual ca)
+target_link_libraries(libwirevisual PRIVATE ca)
 
 # Link cafe with custom lib
-target_link_libraries(libwirevisual cafe)
+target_link_libraries(libwirevisual PRIVATE cafe)
+
+# Link GSL with custom lib 
+target_link_libraries(libwirevisual PRIVATE GSL::gsl)
 
 # Link Qt5, QWT and custom lib to the main executable 
 target_link_libraries(wirevisual PRIVATE Qt5::Widgets)

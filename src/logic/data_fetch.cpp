@@ -7,15 +7,18 @@
 #include <string>
 #include <sys/types.h>
 #include <vector>
+#include "profile_analyze.h"
 #include "profile_fetch.h"
 
 
 DataFetch::DataFetch() {
     m_profile_fetch = new ProfileFetch();
+    m_profile_analyze = new ProfileAnalyze();
 }
 
 DataFetch::~DataFetch() {
     delete m_profile_fetch;
+    delete m_profile_analyze;
 }
 
 void DataFetch::fetch(std::vector<std::string> profiles) {
@@ -41,11 +44,16 @@ void DataFetch::fetch(std::vector<std::string> profiles) {
 
         DataPoint* profile = new DataPoint();
         int return_code = m_profile_fetch->fetch(profiles[i], profile);
-        if (return_code != 0)
-            std::cerr << "An error occured while fetching profile \"" << profiles[i] << 
-                "\", the function exited with error code " << return_code << std::endl;
-        
         m_data_points.insert({ profiles[i], profile });
+        if (return_code != 0) {
+            std::cerr << "An error occured while fetching profile \"" << profiles[i];
+            std::cerr << "\", the function exited with error code " << return_code << std::endl;
+            continue;
+        }
+
+        m_profile_analyze->analyze(profile);
+        std::vector<float> fit_y = m_profile_analyze->fit();
+        profile->fit = std::vector<double>(fit_y.begin(), fit_y.end());
     }
 
     data_ready = true;
