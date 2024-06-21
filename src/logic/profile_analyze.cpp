@@ -20,6 +20,7 @@ void ProfileAnalyze::analyze(DataPoint* point) {
     filter_data();
     find_maximum();
     find_interesting_positions();
+    calc_sigma();
 }
 
 std::vector<float> ProfileAnalyze::fit() {
@@ -50,8 +51,8 @@ void ProfileAnalyze::filter_data() {
     for (int i = 0; i < m_size; i++) {
         m_x.push_back(i);
         if ((i > 0) && ((i + 1) < m_size)) {
-            double value = (m_point->x[i - 1] + 2 * m_point->x[i] + m_point->x[i + 1]) / 4;
-            m_y.insert(m_y.begin() + i, value);
+            double value = (m_point->y[i - 1] + 2 * m_point->y[i] + m_point->y[i + 1]) / 4;
+            m_y.push_back(value);
         }
     }
     m_y.push_back(m_point->y[m_size - 1]);
@@ -93,6 +94,7 @@ void ProfileAnalyze::find_interesting_positions() {
 
         m_area += temp_point;
     }
+
 
     half_height_found = false;
     height_135_found = false;
@@ -137,13 +139,13 @@ void ProfileAnalyze::calc_sigma() {
             end = m_max_half_height_index_r + width_half_height;
             if (end > m_size) end = m_size;
         }
-        
+
         SB = 0;
         SEM = 0;
         SZM = 0;
 
         for (int j = start; j < end; j++) {
-            double temp_point = m_y[i];
+            double temp_point = m_y[j];
             EM = j * temp_point;
             ZM = j * EM;
             SB += temp_point;

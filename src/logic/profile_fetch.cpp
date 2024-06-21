@@ -49,7 +49,7 @@ int ProfileFetch::fetch(std::string profile_name, DataPoint* profile) {
     if (size == -1) 
         return -2;
 #ifdef DEBUG 
-    std::cout << "The size of the profile size: " << size << std::endl;
+    std::cout << "The size of the profile is: " << size << std::endl;
 #endif // DEBUG
         
     double x_data[size];
