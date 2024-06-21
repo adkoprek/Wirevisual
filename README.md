@@ -2,7 +2,7 @@
 
 ---
 
-Generic qt scan appilication for HIPA and PROSCAN
+Generic qt scan appilication for HIPA
 
 Author: Adam Koprek adam.koprek@psi.ch
 
