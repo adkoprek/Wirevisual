@@ -16,7 +16,7 @@
 
 ProfileFetch::ProfileFetch() {
     m_cafe = new CAFE();
-    m_cafe->channelOpenPolicy.setTimeout(5.0);
+    m_cafe->channelOpenPolicy.setTimeout(1.0);
 }
 
 ProfileFetch::~ProfileFetch() {

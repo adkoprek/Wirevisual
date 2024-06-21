@@ -70,7 +70,7 @@ void MainWindow::custom_ui_setup() {
 
 void MainWindow::create_overlay() {
     m_loading_overlay = new QWidget(this);
-    int offset = ui.beamline_list->width() * 2;
+    int offset = ui.beamline_list->width() * 1.93;
     m_loading_overlay->setGeometry(QRect(offset, 0, this->width() - offset , this->height()));
     m_loading_overlay->setStyleSheet("background-color: rgba(0, 0, 0, 0.5)");
     auto loading_layout = new QGridLayout();
@@ -85,7 +85,7 @@ void MainWindow::create_overlay() {
 }
 
 void MainWindow::resizeEvent(QResizeEvent* event) {
-    int offset = ui.beamline_list->width() * 2;
+    int offset = ui.beamline_list->width() * 1.93;
     m_loading_overlay->setGeometry(QRect(offset, 0, this->width() - offset , this->height()));
 }
 
