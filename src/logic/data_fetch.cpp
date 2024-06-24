@@ -17,6 +17,9 @@ DataFetch::DataFetch() {
 }
 
 DataFetch::~DataFetch() {
+    for (const auto & [key, value] : m_data_points)
+        delete value;
+
     delete m_profile_fetch;
     delete m_profile_analyze;
 }
@@ -77,6 +80,10 @@ void DataFetch::cancel() {
 
 bool DataFetch::was_canceled() {
     return m_last_canceled;
+}
+
+bool DataFetch::point_exists(std::string profile) {
+    return m_data_points.count(profile);
 }
 
 DataPoint* DataFetch::get_data_point(std::string id) {

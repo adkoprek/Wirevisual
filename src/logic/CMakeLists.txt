@@ -1,4 +1,6 @@
 add_library(libwirevisual
+    data_dump.cpp
+    data_dump.h
     data_fetch.cpp
     data_fetch.h
     data_point.h
@@ -8,4 +10,7 @@ add_library(libwirevisual
     profile_analyze.h
     profile_fetch.h
     profile_fetch.cpp
+    quad_fetch.cpp
+    quad_fetch.h
+    quad_point.h
 )

@@ -16,4 +16,4 @@ const std::string START_COMMAND = "START";
 const std::string QUADS_PV_ACS = ":SOL:1";
 const std::string QUADS_PV_AMPS = ":IST:2";
 const std::string QUADS_PV_FIELD = ":IST:3";
-const std::string RADION_MONITOR_PV_AMP = ":IST:2";
+const std::string CURRENT_PV_MONITOR = ":IST:2";

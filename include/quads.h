@@ -1,9 +1,12 @@
+#pragma once
+
 #include <map>
 #include <string>
 #include <vector>
 
+
 const std::map<std::string, std::vector<std::string>> QUADS = {
-    {"b869", {
+    {"b860", {
             "QWA1",  "QWA2",  "QWA3",  "QWA4",  "QWA5",  "QWA6",
             "QWA7",  "QWA8",  "QWA9",  "QWA10", "QWA11", "QWA12",
             "QWA13", "QWA14", "QWA15", "QWA16", "QWA17", "QWB1",

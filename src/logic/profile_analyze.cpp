@@ -16,6 +16,8 @@ void ProfileAnalyze::analyze(DataPoint* point) {
     m_y.clear();
     m_point = point;
     m_size = m_point->x.size();
+    m_point->offset = point->x[0];
+    m_point->step = point->x[1] - point->x[0];
 
     filter_data();
     find_maximum();
@@ -41,6 +43,9 @@ std::vector<float> ProfileAnalyze::fit() {
         result[3] = 0;
         FunctionFit(7, m_x.data(), y_data.data(), m_y.size(), estimation, result, error, fit_y, &chisqr, &Nparam, fiterr);
     }
+
+    m_point->mean_fit = m_point->offset + result[1] * m_point->step;
+    m_point->sigma_4_fit = fabs(result[2] * m_point->step);
 
 
     return std::vector<float> { fit_y, fit_y + m_size };
@@ -164,4 +169,10 @@ void ProfileAnalyze::calc_sigma() {
             m_sigma_total[i] = 0;
         }
     }
+
+    m_point->mean = m_point->offset + m_centers[0] * m_point->step;
+    m_point->sigma_4 = m_sigma_total[0] * m_point->step;
+    m_point->sigma_4_red = m_sigma_total[1] * m_point->step;
+    m_point->fwhm = m_half_height * m_point->step;
+    m_point->fwhm_fit = m_half_height * m_point->step;
 }

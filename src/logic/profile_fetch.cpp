@@ -152,7 +152,7 @@ int ProfileFetch::load_profile_data(double* x_data, double* y_data) {
 
 void ProfileFetch::round_data(int16_t size, double* x_data, double* y_data) {
     for (int16_t i = 0; i < size; i++) {
-        x_data[i] = std::round(x_data[i] * 1000) / 1000;
-        y_data[i] = std::round(y_data[i] * 1000) / 1000;
+        x_data[i] = std::round(x_data[i] * 1000000) / 1000000;
+        y_data[i] = std::round(y_data[i] * 1000000) / 1000000;
     }
 }

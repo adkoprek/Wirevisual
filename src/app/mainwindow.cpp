@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "data_dump.h"
 #include "data_fetch.h"
 #include "loading_widget.h"
 #include "profiles.h"
@@ -31,9 +32,11 @@
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     custom_ui_setup();
     m_data_fetch = new DataFetch();
+    m_data_dump = new DataDump(m_data_fetch);
 }
 
 MainWindow::~MainWindow() {
+    delete m_data_dump;
     delete m_data_fetch;
     delete m_diagram_layout_1;
     delete m_diagram_layout_2;
@@ -164,11 +167,17 @@ void MainWindow::on_measure_clicked() {
     if (m_busy) return;
     if (!m_selected.size()) return;
     m_to_fetch.clear();
+    m_selected_beamlines.clear();
     for (int i = 0; i < m_selected.size(); i++) {
         std::stringstream ss(m_selected[i]);
         std::string part;
         int count = 0;
         while (getline(ss, part, '/')) {
+            if (count == 0) {
+                auto index = std::find(m_selected_beamlines.begin(), m_selected_beamlines.end(), part);
+                if (index == m_selected_beamlines.end())
+                    m_selected_beamlines.push_back(part);
+            }
             if (count == 1) {
                 auto index = std::find(m_to_fetch.begin(), m_to_fetch.end(), part);
                 if (index == m_to_fetch.end()) {
@@ -233,13 +242,24 @@ void MainWindow::measure() {
     m_work_tread->start();
 }
 
+void MainWindow::save() {
+    std::string fit;
+
+    if (ui.fit_2sigma->isChecked()) fit = "2sigma";
+    else if (ui.fit_2sigmareduced->isChecked()) fit = "2sigmaRed";
+    else if (ui.fit_2sigmafit->isChecked()) fit = "2sigmaFit";
+    else if (ui.fit_fwhm->isChecked()) fit = "fwhm";
+    else if (ui.fit_fwhm_fit->isChecked()) fit = "fwhmFit";
+
+    m_data_dump->dump(m_selected_beamlines, fit);
+}
+
 void MainWindow::create_diagrams() {
     delete m_worker;
     m_work_tread->quit();
     m_work_tread->wait();
     delete m_work_tread;
 
-    m_loading_widget->set_text("Createing the diagrams");
 
     if (m_data_fetch->was_canceled()) {
         m_loading_overlay->hide();
@@ -247,6 +267,9 @@ void MainWindow::create_diagrams() {
         return;
     }
 
+    m_loading_widget->set_text("Saving");
+    save();
+    m_loading_widget->set_text("Createing the diagrams");
 
     while (auto item = m_diagram_layout_1->takeAt(0)) {
         auto widget = item->widget();

@@ -23,6 +23,7 @@ public:
     void resume();
     void cancel();
     bool was_canceled();
+    bool point_exists(std::string profile);
     DataPoint* get_data_point(std::string profile);
 
 private:

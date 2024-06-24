@@ -55,6 +55,9 @@ link_directories(/usr/lib64)
 # Get GSL
 find_package(GSL REQUIRED)
 
+# Add the include directory
+include_directories(include)
+
 # Add the subdirectories
 add_subdirectory(forms)
 add_subdirectory(src/app)

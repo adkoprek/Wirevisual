@@ -1,3 +1,4 @@
+#include <cmath>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -435,7 +436,7 @@ FunctionFit(int fittype, float *XP, float *RP, int Nvals, float *estimation,
       matEmitt(t, &r11, &r12);
       RPout[i] = result[0] * pow(r11, 2) + 2 * result[1] * r11 * r12 +
         result[2] * pow(r12, 2);
-      RPout[i] = 1.e6 * RPout[i];
+      RPout[i] = std::round(RPout[i] * 1000000) / 1000000;
       break;
     }
     }
