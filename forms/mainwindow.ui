@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,3">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0">
         <item>
@@ -24,7 +24,7 @@
           <item>
            <widget class="QListWidget" name="beamline_list">
             <property name="styleSheet">
-             <string notr="true">display: inline-block;</string>
+             <string notr="true">max-width: 140px;</string>
             </property>
             <item>
              <property name="text">
@@ -143,7 +143,7 @@
           <item>
            <widget class="QPushButton" name="measure_button">
             <property name="styleSheet">
-             <string notr="true">width: 50px;</string>
+             <string notr="true">max-width: 140px;</string>
             </property>
             <property name="text">
              <string>Meausre</string>
@@ -151,28 +151,10 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="cancel_button">
-            <property name="text">
-             <string>Cancel</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="stop_button">
-            <property name="text">
-             <string>Stop</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="resume_button">
-            <property name="text">
-             <string>Resume</string>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QPushButton" name="transport_button">
+            <property name="styleSheet">
+             <string notr="true">max-width: 140px;</string>
+            </property>
             <property name="text">
              <string>Transport</string>
             </property>
@@ -180,6 +162,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="mint_button">
+            <property name="styleSheet">
+             <string notr="true">max-width: 140px;</string>
+            </property>
             <property name="text">
              <string>MinT</string>
             </property>
@@ -188,7 +173,7 @@
           <item>
            <widget class="QPushButton" name="replay_button">
             <property name="styleSheet">
-             <string notr="true"/>
+             <string notr="true">max-width: 140px;</string>
             </property>
             <property name="text">
              <string>Replay</string>
@@ -196,7 +181,20 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="pushButton">
+            <property name="styleSheet">
+             <string notr="true">max-width: 140px;</string>
+            </property>
+            <property name="text">
+             <string>Open</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QRadioButton" name="fit_2sigma">
+            <property name="styleSheet">
+             <string notr="true">max-width: 140px;</string>
+            </property>
             <property name="text">
              <string>2 Sigma</string>
             </property>
@@ -204,13 +202,19 @@
           </item>
           <item>
            <widget class="QRadioButton" name="fit_2sigmareduced">
+            <property name="styleSheet">
+             <string notr="true">max-width: 140px;</string>
+            </property>
             <property name="text">
-             <string>2 Sigma Reduced</string>
+             <string>2 Sigma Red</string>
             </property>
            </widget>
           </item>
           <item alignment="Qt::AlignLeft">
            <widget class="QRadioButton" name="fit_2sigmafit">
+            <property name="styleSheet">
+             <string notr="true">max-width: 140px;</string>
+            </property>
             <property name="text">
              <string>2 Sigma Fit</string>
             </property>
@@ -218,6 +222,9 @@
           </item>
           <item>
            <widget class="QRadioButton" name="fit_fwhm">
+            <property name="styleSheet">
+             <string notr="true">max-width: 140px;</string>
+            </property>
             <property name="text">
              <string>FWHM</string>
             </property>
@@ -225,6 +232,9 @@
           </item>
           <item>
            <widget class="QRadioButton" name="fit_fwhm_fit">
+            <property name="styleSheet">
+             <string notr="true">max-width: 140px;</string>
+            </property>
             <property name="text">
              <string>FWHM Fit</string>
             </property>
@@ -233,7 +243,25 @@
          </layout>
         </item>
         <item>
-         <widget class="QListWidget" name="profile_list"/>
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <item>
+           <widget class="QListWidget" name="profile_list">
+            <property name="styleSheet">
+             <string notr="true">max-width: 140px;</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="scrollTogether">
+            <property name="styleSheet">
+             <string notr="true">max-width: 140px;</string>
+            </property>
+            <property name="text">
+             <string>Scroll Together</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </item>
@@ -249,8 +277,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>547</width>
-             <height>854</height>
+             <width>582</width>
+             <height>857</height>
             </rect>
            </property>
           </widget>
@@ -266,8 +294,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>546</width>
-             <height>854</height>
+             <width>582</width>
+             <height>857</height>
             </rect>
            </property>
           </widget>

@@ -5,6 +5,7 @@
 #include "profiles.h"
 #include "worker.h"
 #include <QWidget>
+#include <QScrollBar>
 #include <QMainWindow>
 #include <QMessageBox>
 #include <algorithm>
@@ -48,33 +49,32 @@ void MainWindow::custom_ui_setup() {
     ui.fit_2sigmafit->click();              
     connect(ui.beamline_list, &QListWidget::itemClicked, this, &MainWindow::on_beamline_clicked);
     connect(ui.beamline_list, &QListWidget::itemChanged, this, &MainWindow::on_beamline_selected);
+    connect(ui.profile_list, &QListWidget::itemClicked, this, &MainWindow::on_profile_clicked);
     connect(ui.profile_list, &QListWidget::itemChanged, this, &MainWindow::on_profile_selected);
     connect(ui.measure_button, &QPushButton::clicked, this, &MainWindow::on_measure_clicked);
-    connect(ui.cancel_button, &QPushButton::clicked, this, &MainWindow::on_cancel_clicked);
-    connect(ui.stop_button, &QPushButton::clicked, this, &MainWindow::on_stop_clicked);
-    connect(ui.resume_button, &QPushButton::clicked, this, &MainWindow::on_resume_clicked);
+    // connect(ui.cancel_button, &QPushButton::clicked, this, &MainWindow::on_cancel_clicked);
+    // connect(ui.stop_button, &QPushButton::clicked, this, &MainWindow::on_stop_clicked);
+    // connect(ui.resume_button, &QPushButton::clicked, this, &MainWindow::on_resume_clicked);
     connect(ui.transport_button, &QPushButton::clicked, this, &MainWindow::on_transport_clicked);
     connect(ui.mint_button, &QPushButton::clicked, this, &MainWindow::on_mint_clicked);
     connect(ui.replay_button, &QPushButton::clicked, this, &MainWindow::on_replay_clicked);
+    connect(ui.scrollArea->verticalScrollBar(), &QScrollBar::valueChanged, this, &MainWindow::sync_scroll);
+    connect(ui.scrollArea_2->verticalScrollBar(), &QScrollBar::valueChanged, this, &MainWindow::sync_scroll);
 
     on_beamline_clicked(ui.beamline_list->item(0));
 
     m_diagram_layout_1 = new QVBoxLayout();
     m_diagram_layout_2 = new QVBoxLayout();
-    auto widget1 = new QWidget();
-    widget1->setLayout(m_diagram_layout_1);
-    ui.scrollArea->setWidget(widget1);
-    auto widget2 = new QWidget();
-    widget2->setLayout(m_diagram_layout_2);
-    ui.scrollArea_2->setWidget(widget2);
+    ui.scrollAreaWidgetContents->setLayout(m_diagram_layout_1);
+    ui.scrollAreaWidgetContents_2->setLayout(m_diagram_layout_2);
+
 
     create_overlay();
 }
 
 void MainWindow::create_overlay() {
     m_loading_overlay = new QWidget(this);
-    int offset = ui.beamline_list->width() * 1.93;
-    m_loading_overlay->setGeometry(QRect(offset, 0, this->width() - offset , this->height()));
+    m_loading_overlay->setGeometry(this->geometry());
     m_loading_overlay->setStyleSheet("background-color: rgba(0, 0, 0, 0.5)");
     auto loading_layout = new QGridLayout();
     m_loading_overlay->setLayout(loading_layout);
@@ -88,8 +88,7 @@ void MainWindow::create_overlay() {
 }
 
 void MainWindow::resizeEvent(QResizeEvent* event) {
-    int offset = ui.beamline_list->width() * 1.93;
-    m_loading_overlay->setGeometry(QRect(offset, 0, this->width() - offset , this->height()));
+    m_loading_overlay->setGeometry(0, 0, this->width(), this->height());
 }
 
 void MainWindow::on_beamline_clicked(QListWidgetItem* item) {
@@ -143,6 +142,10 @@ void MainWindow::on_beamline_selected(QListWidgetItem* item) {
     on_beamline_clicked(ui.beamline_list->item(std::distance(PROFILES.begin(), PROFILES.find(selected_item))));
 }
 
+void MainWindow::on_profile_clicked(QListWidgetItem* item) {
+    on_profile_selected(item);
+}
+
 void MainWindow::on_profile_selected(QListWidgetItem* item) {
     ui.profile_list->setCurrentItem(item);
     QListWidgetItem* current_beamline_item = ui.beamline_list->currentItem();
@@ -161,6 +164,14 @@ void MainWindow::on_profile_selected(QListWidgetItem* item) {
         m_program_uncheck = true;
         current_beamline_item->setCheckState(Qt::Unchecked);
     }
+}
+
+void MainWindow::sync_scroll(int value) {
+    if (!ui.scrollTogether->isChecked()) return;
+    if (sender() == ui.scrollArea->verticalScrollBar()) 
+        ui.scrollArea_2->verticalScrollBar()->setValue(value);
+    else if (sender() == ui.scrollArea_2->verticalScrollBar()) 
+        ui.scrollArea->verticalScrollBar()->setValue(value);
 }
 
 void MainWindow::on_measure_clicked() {
@@ -315,6 +326,8 @@ void MainWindow::create_diagrams() {
 
         QwtPlotZoomer* zoomer = new QwtPlotZoomer(plot->canvas());
 
+        plot->setMinimumHeight(this->height() * 0.4);
+        plot->setMaximumHeight(this->height() * 0.4);
         plot->replot();
 
         int profile_number = point->name[3] * 10 + point->name[4];

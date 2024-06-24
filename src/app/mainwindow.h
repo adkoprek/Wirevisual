@@ -25,7 +25,10 @@ public:
 public slots:
     void on_beamline_clicked(QListWidgetItem* item);
     void on_beamline_selected(QListWidgetItem* item);
+    void on_profile_clicked(QListWidgetItem* item);
     void on_profile_selected(QListWidgetItem* item);
+
+    void sync_scroll(int value);
 
     void on_measure_clicked();
     void on_cancel_clicked();
