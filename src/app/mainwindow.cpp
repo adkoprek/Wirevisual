@@ -235,7 +235,10 @@ void MainWindow::measure() {
     m_loading_overlay->show();
 
     m_work_tread = new QThread();
-    m_worker = new Worker([this]{ m_data_fetch->fetch(m_to_fetch); });
+    m_worker = new Worker([this]{ 
+        m_data_fetch->fetch(m_to_fetch); 
+        if (!m_data_fetch->was_canceled()) save();
+    });
     m_worker->moveToThread(m_work_tread);
     connect(m_work_tread, &QThread::started, m_worker, &Worker::execute_work);
     connect(m_worker, &Worker::work_done, this, &MainWindow::create_diagrams, Qt::QueuedConnection);
@@ -267,8 +270,6 @@ void MainWindow::create_diagrams() {
         return;
     }
 
-    m_loading_widget->set_text("Saving");
-    save();
     m_loading_widget->set_text("Createing the diagrams");
 
     while (auto item = m_diagram_layout_1->takeAt(0)) {

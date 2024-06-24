@@ -13,9 +13,9 @@ const std::map<std::string, std::string> CURENTS = {
     {"ip2",         "MYC1"},
     {"iw2",         "MXC1"},
     {"pkbhe",       "MHC5"},
-    {"pksinq",      "NHC6"},
+    {"pksinq",      "MHC6"},
     {"pktebhe",     "MHC5"},
-    {"pktm",        "NHC1"},
+    {"pktm",        "MHC1"},
     {"pktmte",      "MHC4"},
     {"sinq",        "MHC6"},
     {"ucn",         "MBC1"}

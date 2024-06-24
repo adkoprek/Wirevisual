@@ -9,13 +9,13 @@ const std::map<std::string, std::vector<std::string>> QUADS = {
     {"b860", {
             "QWA1",  "QWA2",  "QWA3",  "QWA4",  "QWA5",  "QWA6",
             "QWA7",  "QWA8",  "QWA9",  "QWA10", "QWA11", "QWA12",
-            "QWA13", "QWA14", "QWA15", "QWA16", "QWA17", "QWB1",
-            "QWB2",  "QWB3",  "QWB4",  "QWB5",  "QWB6",  "QWB7",
-            "QWB8",  "WVB1",  "WVB2" 
+            "QWA13", "QWA15", "QWA16", "QWA17", "QWB1",  "QWB2",  
+            "QWB3",  "QWB4",  "QWB5",  "QWB6",  "QWB7",  "QWB8",  
+            "WVB1",  "WVB2" 
         }
     },
     {"bce", {
-            "QBB1", "QBB2", "QBB3", "QBB4", "QBB5", "QBB6",
+            "QBB1", "QBB2", "QBB3", "QBB4", "QBA5", "QBA6",
             "QCA1", "QCA2"
         }
     },
@@ -57,9 +57,8 @@ const std::map<std::string, std::vector<std::string>> QUADS = {
             "QHA1",   "QHA2",   "QHA3",   "QHA4",   "QHTC5",  "QHTC6",  
             "QHB7",   "QHB8",   "QHA9",   "QHA10",  "QHC11",  "QHC12", 
             "QHTC13", "QHTC14", "QHTC15", "QHTC16", "QHTC17", "QHTC18", 
-            "QHG18",  "QHG21",  "QHG22",  "QHG23",  "QHG24",  "QHI25",  
-            "QHI26",  "QHI27",  "QHI28",  "QHI29",  "QHJ30",  "QHJ31", 
-            "QHJ32"
+            "QHG21",  "QHG22",  "QHG23",  "QHG24",  "QHI25",  "QHI26",  
+            "QHI27",  "QHI28",  "QHI29",  "QHJ30",  "QHJ31",  "QHJ32"
         }
     },
     {"pktebhe", {

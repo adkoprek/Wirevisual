@@ -38,7 +38,12 @@ void DataDump::dump(std::vector<std::string> beam_lines, std::string fit) {
         m_mes_file = new std::ofstream(get_file_path());
         *m_mes_file << std::fixed << std::showpoint;
         fetch_current_profile_names(); 
-        fetch_current();
+        int status = fetch_current();
+        if (status != 0) {
+            std::cerr << "The previous error is not acceptable skipping beamline \"";
+            std::cerr << m_beam_line << "\"" << std::endl;;
+            continue;
+        }
         add_header();
 
         for (int i = 0; i < m_current_profile_names.size(); i++)
