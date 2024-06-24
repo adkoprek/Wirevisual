@@ -52,9 +52,6 @@ void MainWindow::custom_ui_setup() {
     connect(ui.profile_list, &QListWidget::itemClicked, this, &MainWindow::on_profile_clicked);
     connect(ui.profile_list, &QListWidget::itemChanged, this, &MainWindow::on_profile_selected);
     connect(ui.measure_button, &QPushButton::clicked, this, &MainWindow::on_measure_clicked);
-    // connect(ui.cancel_button, &QPushButton::clicked, this, &MainWindow::on_cancel_clicked);
-    // connect(ui.stop_button, &QPushButton::clicked, this, &MainWindow::on_stop_clicked);
-    // connect(ui.resume_button, &QPushButton::clicked, this, &MainWindow::on_resume_clicked);
     connect(ui.transport_button, &QPushButton::clicked, this, &MainWindow::on_transport_clicked);
     connect(ui.mint_button, &QPushButton::clicked, this, &MainWindow::on_mint_clicked);
     connect(ui.replay_button, &QPushButton::clicked, this, &MainWindow::on_replay_clicked);
@@ -83,6 +80,10 @@ void MainWindow::create_overlay() {
     m_loading_widget->set_text("Loading the profiles");
     m_loading_widget->start();
     loading_layout->addWidget(m_loading_widget);
+    
+    connect(m_loading_widget, &LoadingWidget::cancel_clicked, this, &MainWindow::on_cancel_clicked);
+    connect(m_loading_widget, &LoadingWidget::stop_clicked, this, &MainWindow::on_stop_clicked);
+    connect(m_loading_widget, &LoadingWidget::resume_clicked, this, &MainWindow::on_resume_clicked);
 
     m_loading_overlay->hide();
 }

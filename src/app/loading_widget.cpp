@@ -15,6 +15,10 @@ LoadingWidget::LoadingWidget(QWidget* parent) : QWidget(parent) {
     m_buffer->open(QIODevice::ReadOnly);
     m_movie = new QMovie(m_buffer, "GIF");
     ui.animation->setMovie(m_movie);
+     
+    connect(ui.cancelButton, &QPushButton::clicked, [this] {emit cancel_clicked();});
+    connect(ui.stopButton, &QPushButton::clicked, [this] {emit stop_clicked();});
+    connect(ui.resumeButton, &QPushButton::clicked, [this] {emit resume_clicked();});
 }
 
 LoadingWidget::~LoadingWidget() {

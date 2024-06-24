@@ -1,5 +1,6 @@
 #pragma once
 #include <QMainWindow>
+#include <csignal>
 #include <qbuffer.h>
 #include <qlistwidget.h>
 #include <qobjectdefs.h>
@@ -21,6 +22,11 @@ public:
     void set_text(std::string text);
     void start();
     void stop();
+
+signals:
+    void cancel_clicked();
+    void stop_clicked();
+    void resume_clicked();
 
 private:
     Ui::Loading ui;
