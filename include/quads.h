@@ -80,7 +80,7 @@ const std::map<std::string, std::vector<std::string>> QUADS = {
         }
     },
     {"ucn", {
-            "QBB1", "QBB2", "QBB3", "QBB4", "QBB5", "QBB6",
+            "QBB1", "QBB2", "QBB3", "QBB4", "QBA5", "QBA6",
             "QBB7"
         }
     }

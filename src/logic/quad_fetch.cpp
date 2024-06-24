@@ -21,8 +21,10 @@ QuadFetch::~QuadFetch() {
 
 void QuadFetch::fetch(std::vector<std::string> names) {
     m_num_valid_measurements = 0;
-    for (const auto & [key, value] : m_quads)
+    for (const auto & [key, value] : m_quads) {
         delete value;
+    }
+    m_quads.clear();
 
     for (int i = 0; i < names.size(); i++) {
         m_current_quad = names[i];
