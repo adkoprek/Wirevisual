@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "data_dump.h"
 #include "data_fetch.h"
+#include "fits.h"
 #include "loading_widget.h"
 #include "profiles.h"
 #include "worker.h"
@@ -258,13 +259,13 @@ void MainWindow::measure() {
 }
 
 void MainWindow::save() {
-    std::string fit;
+    FITS fit;
 
-    if (ui.fit_2sigma->isChecked()) fit = "2sigma";
-    else if (ui.fit_2sigmareduced->isChecked()) fit = "2sigmaRed";
-    else if (ui.fit_2sigmafit->isChecked()) fit = "2sigmaFit";
-    else if (ui.fit_fwhm->isChecked()) fit = "fwhm";
-    else if (ui.fit_fwhm_fit->isChecked()) fit = "fwhmFit";
+    if (ui.fit_2sigma->isChecked()) fit = FITS::TWO_SIGMA;
+    else if (ui.fit_2sigmareduced->isChecked()) fit = FITS::TWO_SIGMA_RED;
+    else if (ui.fit_2sigmafit->isChecked()) fit = FITS::TWO_SIGMA_FIT;
+    else if (ui.fit_fwhm->isChecked()) fit = FITS::FWHM;
+    else if (ui.fit_fwhm_fit->isChecked()) fit = FITS::FWHM_FIT;
 
     m_data_dump->dump(m_selected_beamlines, fit);
 }

@@ -85,4 +85,3 @@ const std::map<std::string, std::vector<std::string>> QUADS = {
         }
     }
 };
-

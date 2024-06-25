@@ -1,4 +1,5 @@
 add_library(libwirevisual
+    create_transport.cpp
     data_dump.cpp
     data_dump.h
     data_fetch.cpp

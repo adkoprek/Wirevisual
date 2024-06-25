@@ -47,7 +47,8 @@ std::vector<float> ProfileAnalyze::fit() {
     m_point->mean_fit = m_point->offset + result[1] * m_point->step;
     m_point->sigma_4_fit = fabs(result[2] * m_point->step);
 
-
+    // Fir function returns nan if the firt y-value is 0
+    if (fit_y[0] != fit_y[0]) fit_y[0] = 0;
     return std::vector<float> { fit_y, fit_y + m_size };
 }
 
