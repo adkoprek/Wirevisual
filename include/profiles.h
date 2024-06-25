@@ -94,10 +94,10 @@ const std::map<std::string, std::vector<std::string>> PROFILES {
             "MHP25", "MHP26", "MHP27", "MHP28",
             "MHP29", "MHP30", "MHP31", "MHP32",
             "MHP33", "MHP34", "MHP41", "MHP42",
-            "MHP43", "MHP44", "MHP46", "MHP47",
-            "MHP48", "MHP49", "MHP50", "MHP51",
-            "MHP52", "MHP53", "MHP54", "MHP55",
-            "MHP56", "MHP57", "MHP58",
+            "MHP43", "MHP44", "MHP45", "MHP46", 
+            "MHP47", "MHP48", "MHP49", "MHP50", 
+            "MHP51", "MHP52", "MHP53", "MHP54", 
+            "MHP55", "MHP56", "MHP57", "MHP58",
         }
     },
     {"pktebhe", {
@@ -122,10 +122,10 @@ const std::map<std::string, std::vector<std::string>> PROFILES {
     },
     {"sinq", {
             "MHP41", "MHP42", "MHP43", "MHP44", 
-            "MHP46", "MHP47", "MHP48", "MHP49", 
-            "MHP50", "MHP51", "MHP52", "MHP53", 
-            "MHP54", "MHP55", "MHP56", "MHP57", 
-            "MHP58",
+            "MHP45", "MHP46", "MHP47", "MHP48", 
+            "MHP49", "MHP50", "MHP51", "MHP52", 
+            "MHP53", "MHP54", "MHP55", "MHP56", 
+            "MHP57", "MHP58",
         }
     },
     {"ucn", {
