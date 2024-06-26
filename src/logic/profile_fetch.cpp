@@ -12,7 +12,7 @@
 #include <vector>
 #include <chrono>
 
-
+#define DEBUG
 
 ProfileFetch::ProfileFetch() {
     m_cafe = new CAFE();
@@ -29,7 +29,6 @@ int ProfileFetch::fetch(std::string profile_name, DataPoint* profile) {
     profile->name = profile_name;
     profile->valid_data = false;
 
-#ifndef DEBUG
     if (profile_name[2] != 'H') {
         activate_scan();
         char i = 0;
@@ -44,7 +43,6 @@ int ProfileFetch::fetch(std::string profile_name, DataPoint* profile) {
         if (i > 50)
             return -1;
     }
-#endif // !DEBUG 
     
 
     auto size = get_size_of_profile(); 
@@ -76,6 +74,7 @@ int ProfileFetch::fetch(std::string profile_name, DataPoint* profile) {
 int ProfileFetch::activate_scan() {
     std::string command = m_current_profile + PV_ACTIVATE_SCAN;
 
+    std::cout << "Activated Scan" << std::endl;
     int status = m_cafe->set(command.c_str(), START_COMMAND.c_str());
     if (status != ICAFE_NORMAL) {
         std::cerr << "An error occured while starting the wirescan for the profile \"" <<

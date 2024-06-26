@@ -235,7 +235,7 @@ void MainWindow::on_transport_clicked() {
         char command[128];
         const char* program = "loadtrans";
         strcpy(command, BD_PATH);
-        strcpy(command, program);
+        strcat(command, program);
         char* options[2];
         options[0] = command;
         options[1] = NULL;
@@ -253,20 +253,22 @@ void MainWindow::on_mint_clicked() {
         char mint_file[512];
         char* file_folder = getenv("TRANSMESS");
         strcpy(mint_file, file_folder);
-        strcpy(mint_file, "/");
-        strcpy(mint_file, m_selected_beamlines[0].c_str());
-        strcpy(mint_file, "/");
-        strcpy(mint_file, m_selected_beamlines[0].c_str());
-        strcpy(mint_file, "_");
-        strcpy(mint_file, m_data_dump->get_last_data().c_str());
-        strcpy(mint_file, ".mint");
+        strcat(mint_file, "/");
+        strcat(mint_file, m_selected_beamlines[0].c_str());
+        strcat(mint_file, "/");
+        strcat(mint_file, m_selected_beamlines[0].c_str());
+        strcat(mint_file, "_");
+        strcat(mint_file, m_data_dump->get_last_data().c_str());
+        strcat(mint_file, ".mint");
+
+	std::cout << "MinT file: " << mint_file << std::endl;
 
         char* options[2];
         options[0] = mint_file;
         options[1] = NULL;
         execvp(mint_file, options);
 
-        std::cerr << "Failed to open MinT";
+        std::cerr << "Failed to open MinT" << std::endl;
         exit(1);
     } else {}
 }
