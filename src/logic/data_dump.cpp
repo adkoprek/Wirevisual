@@ -337,7 +337,7 @@ void DataDump::add_022_sigmav() {
 
 void DataDump::move_dat_file() {
     std::string temp_dat_file;
-    temp_dat_file += std::string(BD_PATH) + m_beam_line + "/";
+    temp_dat_file += std::string(getenv("TRANSMESS")) + m_beam_line + "/";
     temp_dat_file += m_beam_line + "_0.dat";
     int i = 0;
     while (i < 10) {
