@@ -19,6 +19,7 @@ public:
     ~DataDump();
 
     void dump(str_array beam_lines, FITS fit);
+    std::string get_last_data();
     
 private:
     CAFE* m_cafe;

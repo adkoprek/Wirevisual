@@ -24,7 +24,6 @@
 #include <sys/wait.h>
 
 
-#define FILE_BASE_PATH "."
 #define BD_PATH "/proscan/bd/bin/"
 extern int updateTransportFile(char *transLine, int nbDevs, str9 *Quads, int *QuadsSign, float *values,
                         str50 *qerrMsg, int nbProfs, str9 *Profs, str50 *perrMsg, float *sigma2,
@@ -97,6 +96,10 @@ void DataDump::dump(std::vector<std::string> beam_lines, FITS fit) {
     }
 }
 
+std::string DataDump::get_last_data() {
+    return m_date;
+}
+
 void DataDump::get_local_time() {
     time_t now = time(0);
     m_tm = localtime(&now);
@@ -122,7 +125,7 @@ std::string DataDump::get_file_path() {
     m_date += std::to_string(m_tm->tm_sec);
 
     file_name += m_beam_line + "_" + m_date;
-    return std::string(FILE_BASE_PATH) + "/" + file_name;
+    return std::string(getenv("TRANSMESS")) + "/" + file_name;
 }
 
 void DataDump::fetch_current_profile_names() {

@@ -14,6 +14,8 @@
 #include "worker.h"
 
 
+#define BD_PATH "/proscan/bd/bin/"
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT

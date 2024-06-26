@@ -13,6 +13,7 @@
 #include <cstddef>
 #include <cstdlib>
 #include <QThread>
+#include <cstring>
 #include <iterator>
 #include <QListWidget>
 #include <qcoreevent.h>
@@ -23,6 +24,7 @@
 #include <qwidget.h>
 #include <sstream>
 #include <string>
+#include <sys/types.h>
 #include <unistd.h>
 #include <vector>
 #include <qwt_plot.h>
@@ -229,11 +231,46 @@ void MainWindow::on_resume_clicked() {
 }
 
 void MainWindow::on_transport_clicked() {
-    // Open Transport
-}
+    pid_t pid = fork();
+
+    if (pid == 0) {
+        char command[128];
+        const char* program = "loadtrans";
+        strcpy(command, BD_PATH);
+        strcpy(command, program);
+        char* options[2];
+        options[0] = command;
+        options[1] = NULL;
+        execvp(command, options);
+
+        std::cerr << "Failed to open transport";
+        exit(1);
+    } else {}
+} 
 
 void MainWindow::on_mint_clicked() {
-    // Open Mint
+    pid_t pid = fork();
+
+    if (pid == 0) {
+        char mint_file[512];
+        char* file_folder = getenv("TRANSMESS");
+        strcpy(mint_file, file_folder);
+        strcpy(mint_file, "/");
+        strcpy(mint_file, m_selected_beamlines[0].c_str());
+        strcpy(mint_file, "/");
+        strcpy(mint_file, m_selected_beamlines[0].c_str());
+        strcpy(mint_file, "_");
+        strcpy(mint_file, m_data_dump->get_last_data().c_str());
+        strcpy(mint_file, ".mint");
+
+        char* options[2];
+        options[0] = mint_file;
+        options[1] = NULL;
+        execvp(mint_file, options);
+
+        std::cerr << "Failed to open MinT";
+        exit(1);
+    } else {}
 }
 
 void MainWindow::on_replay_clicked() {

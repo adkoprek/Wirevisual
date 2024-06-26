@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -127,7 +128,7 @@ int updateTransportFile(char *transLine, int nbDevs, str9 *Quads, int *QuadsSign
                         int *nbHor, float *sigma2h, int *nbVer, float *sigma2v)
 {
   char            *dataFolder  = getenv("TRANSDATA");
-  char            *transFolder = "./";
+  char            *transFolder = getenv("TRANSMESS");
   char            aliasFile[256], blrefsFile[256];
   int             nbline = 0;
   int             found = False;
