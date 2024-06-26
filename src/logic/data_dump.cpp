@@ -125,7 +125,7 @@ std::string DataDump::get_file_path() {
     m_date += std::to_string(m_tm->tm_sec);
 
     file_name += m_beam_line + "_" + m_date;
-    return std::string(getenv("TRANSMESS")) + "/" + file_name;
+    return std::string(getenv("TRANSMESS")) + "/" + m_beam_line + "/" + file_name;
 }
 
 void DataDump::fetch_current_profile_names() {
@@ -189,7 +189,8 @@ void DataDump::add_mes_header() {
 void DataDump::add_mes_profile_data(std::string profile) {
     auto point = m_data_fetch->get_data_point(profile);
     if (!point->valid_data) return;
-
+    if (profile[3] == '0') profile.erase(3, 1);
+ 
     *m_mes_file << std::setprecision(3) << "Profil     " << profile;
     *m_mes_file << "   offset " << point->offset;
     *m_mes_file << "   step " << point->step;
@@ -337,14 +338,16 @@ void DataDump::add_022_sigmav() {
 
 void DataDump::move_dat_file() {
     std::string temp_dat_file;
-    temp_dat_file += std::string(BD_PATH) + m_beam_line + "/";
+    temp_dat_file += std::string(getenv("TRANSMESS")) + "/" + m_beam_line + "/";
     temp_dat_file += m_beam_line + "_0.dat";
+    std::cout << "The temp dat file path: " << temp_dat_file << std::endl;
     int i = 0;
     while (i < 10) {
-        if (access(temp_dat_file.c_str(), F_OK)) {
+        if (access(temp_dat_file.c_str(), F_OK) == 0) {
             std::string command = "mv " + temp_dat_file + " "; 
-            command += std::string(BD_PATH) + "/" + m_date + ".dat";
+            command += std::string(getenv("TRANSMESS")) + "/"  + m_beam_line + "/" + m_beam_line + "_" + m_date + ".dat";
             char command_str[command.length() + 1];
+            std::cout << "Move command: " << command << std::endl;
             strcpy(command_str, command.c_str());
             system(command_str);
             break;

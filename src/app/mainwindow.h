@@ -16,7 +16,7 @@
 #include "worker.h"
 
 
-#define BD_PATH "/proscan/bd/bin/"
+#define BD_PATH "/hipa/bd/bin/"
 
 class MainWindow : public QMainWindow
 {
