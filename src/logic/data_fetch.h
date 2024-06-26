@@ -5,7 +5,7 @@
 #include <mutex>
 #include <string>
 #include <vector>
-#include "data_point.h"
+#include "file_header.h"
 #include "profile_analyze.h"
 #include "profile_fetch.h"
 
@@ -19,12 +19,14 @@ public:
     bool data_ready = false;
 
     void fetch(std::vector<std::string> profiles);
+    int load(std::string file_name);
     void stop();
     void resume();
     void cancel();
     bool was_canceled();
     bool point_exists(std::string profile);
     DataPoint* get_data_point(std::string profile);
+    FileHeader* get_file_header();
 
 private:
     bool m_stop_flag = false;
@@ -35,4 +37,5 @@ private:
     std::mutex m_mu;
     ProfileFetch* m_profile_fetch;
     ProfileAnalyze* m_profile_analyze;
+    FileHeader* m_file_header = nullptr;
 };

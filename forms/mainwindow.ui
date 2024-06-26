@@ -146,7 +146,27 @@
              <string notr="true">max-width: 140px;</string>
             </property>
             <property name="text">
-             <string>&amp;Meausre</string>
+             <string>&amp;Measure</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="remeasure_button">
+            <property name="styleSheet">
+             <string notr="true">max-width: 140px;</string>
+            </property>
+            <property name="text">
+             <string>&amp;Remeasure</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="open_button">
+            <property name="styleSheet">
+             <string notr="true">max-width: 140px;</string>
+            </property>
+            <property name="text">
+             <string>&amp;Open</string>
             </property>
            </widget>
           </item>
@@ -167,26 +187,6 @@
             </property>
             <property name="text">
              <string>Mi&amp;nT</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="replay_button">
-            <property name="styleSheet">
-             <string notr="true">max-width: 140px;</string>
-            </property>
-            <property name="text">
-             <string>&amp;Replay</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButton">
-            <property name="styleSheet">
-             <string notr="true">max-width: 140px;</string>
-            </property>
-            <property name="text">
-             <string>&amp;Open</string>
             </property>
            </widget>
           </item>
@@ -258,6 +258,16 @@
             </property>
             <property name="text">
              <string>Scroll Together</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="keep">
+            <property name="styleSheet">
+             <string notr="true">max-width: 140px;</string>
+            </property>
+            <property name="text">
+             <string>Keep</string>
             </property>
            </widget>
           </item>

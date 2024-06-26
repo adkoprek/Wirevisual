@@ -12,6 +12,8 @@
 #include "../../forms/ui_loading.h"
 
 
+#define COLORS = {Qt}
+
 class LoadingWidget : public QWidget 
 {
     Q_OBJECT

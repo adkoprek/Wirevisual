@@ -9,6 +9,7 @@
 #include <QScrollBar>
 #include <QMainWindow>
 #include <QMessageBox>
+#include <QFileDialog>
 #include <algorithm>
 #include <cstddef>
 #include <cstdlib>
@@ -50,16 +51,16 @@ MainWindow::~MainWindow() {
 void MainWindow::custom_ui_setup() {
     ui.setupUi(this);                       
     ui.fit_2sigmafit->click();              
-    connect(ui.beamline_list, &QListWidget::itemClicked, this, &MainWindow::on_beamline_clicked);
-    connect(ui.beamline_list, &QListWidget::itemChanged, this, &MainWindow::on_beamline_selected);
-    connect(ui.profile_list, &QListWidget::itemClicked, this, &MainWindow::on_profile_clicked);
-    connect(ui.profile_list, &QListWidget::itemChanged, this, &MainWindow::on_profile_selected);
-    connect(ui.measure_button, &QPushButton::clicked, this, &MainWindow::on_measure_clicked);
-    connect(ui.transport_button, &QPushButton::clicked, this, &MainWindow::on_transport_clicked);
-    connect(ui.mint_button, &QPushButton::clicked, this, &MainWindow::on_mint_clicked);
-    connect(ui.replay_button, &QPushButton::clicked, this, &MainWindow::on_replay_clicked);
-    connect(ui.scrollArea->verticalScrollBar(), &QScrollBar::valueChanged, this, &MainWindow::sync_scroll);
-    connect(ui.scrollArea_2->verticalScrollBar(), &QScrollBar::valueChanged, this, &MainWindow::sync_scroll);
+    connect(ui.beamline_list,    &QListWidget::itemClicked, this, &MainWindow::on_beamline_clicked);
+    connect(ui.beamline_list,    &QListWidget::itemChanged, this, &MainWindow::on_beamline_selected);
+    connect(ui.profile_list,     &QListWidget::itemChanged, this, &MainWindow::on_profile_selected);
+    connect(ui.measure_button,   &QPushButton::clicked,     this, &MainWindow::on_measure_clicked);
+    connect(ui.transport_button, &QPushButton::clicked,     this, &MainWindow::on_transport_clicked);
+    connect(ui.mint_button,      &QPushButton::clicked,     this, &MainWindow::on_mint_clicked);
+    connect(ui.remeasure_button, &QPushButton::clicked,     this, &MainWindow::on_replay_clicked);
+    connect(ui.open_button,      &QPushButton::clicked,     this, &MainWindow::on_open_clicked);
+    connect(ui.scrollArea->verticalScrollBar(),     &QScrollBar::valueChanged, this, &MainWindow::sync_scroll);
+    connect(ui.scrollArea_2->verticalScrollBar(),   &QScrollBar::valueChanged, this, &MainWindow::sync_scroll);
 
     on_beamline_clicked(ui.beamline_list->item(0));
 
@@ -84,9 +85,9 @@ void MainWindow::create_overlay() {
     m_loading_widget->start();
     loading_layout->addWidget(m_loading_widget);
     
-    connect(m_loading_widget, &LoadingWidget::cancel_clicked, this, &MainWindow::on_cancel_clicked);
-    connect(m_loading_widget, &LoadingWidget::stop_clicked, this, &MainWindow::on_stop_clicked);
-    connect(m_loading_widget, &LoadingWidget::resume_clicked, this, &MainWindow::on_resume_clicked);
+    connect(m_loading_widget, &LoadingWidget::cancel_clicked,   this, &MainWindow::on_cancel_clicked);
+    connect(m_loading_widget, &LoadingWidget::stop_clicked,     this, &MainWindow::on_stop_clicked);
+    connect(m_loading_widget, &LoadingWidget::resume_clicked,   this, &MainWindow::on_resume_clicked);
 
     m_loading_overlay->hide();
 }
@@ -146,10 +147,6 @@ void MainWindow::on_beamline_selected(QListWidgetItem* item) {
     on_beamline_clicked(ui.beamline_list->item(std::distance(PROFILES.begin(), PROFILES.find(selected_item))));
 }
 
-void MainWindow::on_profile_clicked(QListWidgetItem* item) {
-    on_profile_selected(item);
-}
-
 void MainWindow::on_profile_selected(QListWidgetItem* item) {
     ui.profile_list->setCurrentItem(item);
     QListWidgetItem* current_beamline_item = ui.beamline_list->currentItem();
@@ -204,6 +201,7 @@ void MainWindow::on_measure_clicked() {
     }
     m_selected.clear();
     reset_beamlines();
+    ui.keep->setCheckState(Qt::Unchecked);
 
     measure();
 }
@@ -278,7 +276,52 @@ void MainWindow::on_replay_clicked() {
     measure();
 }
 
+void MainWindow::on_open_clicked() {
+    static QString selected_filter = "All Transprof Files (*.mes)";
+    QString file_name = QFileDialog::getOpenFileName(this,
+                                          "Open Transprof File",
+                                          getenv("TRANSMESS"),
+                                          "870 (b860*.mes);;"
+                                          "BCE (bce*.mes);;"
+                                          "BW2 (bw2*.mes);;"
+                                          "BX1 (bx1*.mes);;"
+                                          "BX2 (bx2*.mes);;"
+                                          "IP2 (ip2*.mes);;"
+                                          "IW2 (iw2*.mes);;"
+                                          "PKANAL (pkan*.mes);;"
+                                          "PKANAL & DUMP (pkbhe*.mes);;"
+                                          "PKANAL & SINQ (pksinq*.mes);;"
+                                          "TARGET E (pktebhe*.mes);;"
+                                          "TARGET M (pktm_*.mes);;"
+                                          "TARGET E & M (pktmte*.mes);;"
+                                          "SINQ (sinq*.mes);;"
+                                          "UCN (ucn_*.mes);;"
+                                          "All Transprof Files (*.mes)",
+                                          &selected_filter);
+
+    if (file_name.isEmpty() == true) return;
+    QFileInfo fileInfo(file_name);
+    QString file_name_measurement = fileInfo.baseName();
+    std::string data_file = file_name.toStdString();
+    int status = m_data_fetch->load(data_file);
+
+    if (status != 0) {
+        QMessageBox msg(QMessageBox::Warning,"",
+                    QString("The file is corrupted"),
+                    QMessageBox::NoButton,this);
+        msg.exec();
+        return;
+    }
+
+    FileHeader* header = m_data_fetch->get_file_header();
+    m_to_fetch = header->profile_names;
+    m_from_file = true;
+    if (ui.keep->isChecked()) add_to_diagrams();
+    else create_diagrams();
+}
+
 void MainWindow::measure() {
+    m_from_file = false;
     m_busy = true;
     m_loading_widget->set_text("Loading the profiles");
     m_loading_widget->start();
@@ -291,7 +334,10 @@ void MainWindow::measure() {
     });
     m_worker->moveToThread(m_work_tread);
     connect(m_work_tread, &QThread::started, m_worker, &Worker::execute_work);
-    connect(m_worker, &Worker::work_done, this, &MainWindow::create_diagrams, Qt::QueuedConnection);
+    if (ui.keep->isChecked())
+        connect(m_worker, &Worker::work_done, this, &MainWindow::add_to_diagrams, Qt::QueuedConnection);
+    else
+        connect(m_worker, &Worker::work_done, this, &MainWindow::create_diagrams, Qt::QueuedConnection);
     m_work_tread->start();
 }
 
@@ -308,10 +354,12 @@ void MainWindow::save() {
 }
 
 void MainWindow::create_diagrams() {
-    delete m_worker;
-    m_work_tread->quit();
-    m_work_tread->wait();
-    delete m_work_tread;
+    if (!m_from_file) {
+        delete m_worker;
+        m_work_tread->quit();
+        m_work_tread->wait();
+        delete m_work_tread;
+    }
 
 
     if (m_data_fetch->was_canceled()) {
@@ -336,6 +384,8 @@ void MainWindow::create_diagrams() {
         delete item;
     }
 
+    m_plots.clear();
+
     std::vector<std::string> failed_profiles;
 
     for (int i = m_to_fetch.size() - 1; i > -1; i--) {
@@ -354,7 +404,7 @@ void MainWindow::create_diagrams() {
 
             QwtPlotCurve* curve_fit = new QwtPlotCurve("Curve 2");
             curve_fit->setSamples(point->x.data(), point->fit.data(), static_cast<int>(point->x.size()));
-            curve_fit->setTitle("Fitted Data");
+            curve_fit->setTitle("Fit");
             curve_fit->setPen(QPen(Qt::red));
             curve_fit->attach(plot);
         }
@@ -368,6 +418,7 @@ void MainWindow::create_diagrams() {
         plot->setMinimumHeight(this->height() * 0.4);
         plot->setMaximumHeight(this->height() * 0.4);
         plot->replot();
+        m_plots.insert({point->name, plot});
 
         int profile_number = point->name[3] * 10 + point->name[4];
         if (profile_number % 2 == 0) 
@@ -390,6 +441,50 @@ void MainWindow::create_diagrams() {
         m_loading_overlay->hide();
         message_box->exec();
     }
+    m_loading_overlay->hide();
+    m_busy = false;
+}
+
+void MainWindow::add_to_diagrams() {
+    if (!m_from_file) {
+        delete m_worker;
+        m_work_tread->quit();
+        m_work_tread->wait();
+        delete m_work_tread;
+    }
+
+
+    if (m_data_fetch->was_canceled()) {
+        m_loading_overlay->hide();
+        m_busy = false;
+        return;
+    }
+
+    m_loading_widget->set_text("Createing the diagrams");
+
+    for (auto const& [profile, plot] : m_plots) {
+        if (!m_data_fetch->point_exists(profile)) continue;
+        auto point = m_data_fetch->get_data_point(profile);
+        // Remove Fit
+        auto curves = m_plots.at(profile)->itemList(QwtPlotItem::Rtti_PlotCurve);
+        for (QwtPlotItem* item : curves) {
+            QwtPlotCurve* curve = dynamic_cast<QwtPlotCurve*>(item);
+            if (curve->title().text() == "Fit") {
+                curve->detach();
+                delete curve;
+            }
+        }
+
+        QwtPlotCurve* curve_real = new QwtPlotCurve("Curve 3");
+        curve_real->setSamples(point->x.data(), point->y.data(), static_cast<int>(point->x.size()));
+        curve_real->setTitle("Measured Data 2");
+        curve_real->setPen(QPen(Qt::yellow));
+        curve_real->attach(plot);
+
+
+        plot->replot();
+    }
+
     m_loading_overlay->hide();
     m_busy = false;
 }

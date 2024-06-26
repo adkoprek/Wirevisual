@@ -39,7 +39,7 @@ const std::map<std::string, std::vector<std::string>> PROFILES {
         }
     },
     {"bx1", {
-            "MXP03", "MXP04", "MWP05", "MXP06",
+            "MXP03", "MXP04", "MXP05", "MXP06",
             "MXP07", "MXP08", "MXP09", "MXP10",
             "MXP11", "MXP12", "MXP13", "MXP14",
             "MXP15", "MXP16", "MXP17", "MXP18",
@@ -60,7 +60,7 @@ const std::map<std::string, std::vector<std::string>> PROFILES {
         }
     },
     {"iw2", {
-            "MXP03", "MXP04", "MWP05", "MXP06",
+            "MXP03", "MXP04", "MXP05", "MXP06",
             "MXP07", "MXP08", "MXP09", "MXP10",
             "MXP11", "MXP12", "MXP13", "MXP14",
             "MXP15", "MXP16", "MXP17", "MXP18",
@@ -72,7 +72,7 @@ const std::map<std::string, std::vector<std::string>> PROFILES {
         }
     },
     {"pkbhe", {
-            "MHP01", "MWP02", "MHP03", "MHP04",
+            "MHP01", "MHP02", "MHP03", "MHP04",
             "MHP05", "MHP06", "MHP07", "MHP08",
             "MHP09", "MHP10", "MHP11", "MHP12",
             "MHP13", "MHP14", "MHP15", "MHP16",
@@ -85,7 +85,7 @@ const std::map<std::string, std::vector<std::string>> PROFILES {
         }
     },
     {"pksinq", {
-            "MHP01", "MWP02", "MHP03", "MHP04",
+            "MHP01", "MHP02", "MHP03", "MHP04",
             "MHP05", "MHP06", "MHP07", "MHP08",
             "MHP09", "MHP10", "MHP11", "MHP12",
             "MHP13", "MHP14", "MHP15", "MHP16",
@@ -105,19 +105,19 @@ const std::map<std::string, std::vector<std::string>> PROFILES {
         }
     },
     {"pktm", {
-            "MHP01", "MWP02", "MHP03", "MHP04",
+            "MHP01", "MHP02", "MHP03", "MHP04",
             "MHP05", "MHP06", "MHP07", "MHP08",
             "MHP09", "MHP10", "MHP11", "MHP12",
-            "MHP13", "MHP14", "MWP15", "MHP16",
-            "MHP17", "MHP18", "MWP19", "MHP20",
+            "MHP13", "MHP14", "MHP15", "MHP16",
+            "MHP17", "MHP18", "MHP19", "MHP20",
             "MHP21", "MHP22"
         }
     },
     {"pktmte", {
             
-            "MWP23", "MHP24", "MHP25", "MHP26", 
-            "MWP27", "MHP28", "MHP29", "MHP30", 
-            "MWP31", "MHP32", "MHP33", "MHP34"
+            "MHP23", "MHP24", "MHP25", "MHP26", 
+            "MHP27", "MHP28", "MHP29", "MHP30", 
+            "MHP31", "MHP32", "MHP33", "MHP34"
         }
     },
     {"sinq", {

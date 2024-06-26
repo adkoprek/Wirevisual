@@ -24,7 +24,7 @@
 #include <sys/wait.h>
 
 
-#define BD_PATH "/proscan/bd/bin/"
+#define BD_PATH "/hipa/bd/bin/"
 extern int updateTransportFile(char *transLine, int nbDevs, str9 *Quads, int *QuadsSign, float *values,
                         str50 *qerrMsg, int nbProfs, str9 *Profs, str50 *perrMsg, float *sigma2,
                         char *broDev, char *broUnit, float broVal, char *actualTime,

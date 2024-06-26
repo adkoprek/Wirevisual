@@ -6,6 +6,7 @@ add_library(libwirevisual
     data_fetch.h
     data_point.h
     epics_commands.h
+    file_header.h
     fitting.cpp
     profile_analyze.cpp
     profile_analyze.h
