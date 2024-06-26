@@ -146,7 +146,7 @@
              <string notr="true">max-width: 140px;</string>
             </property>
             <property name="text">
-             <string>Meausre</string>
+             <string>&amp;Meausre</string>
             </property>
            </widget>
           </item>
@@ -156,7 +156,7 @@
              <string notr="true">max-width: 140px;</string>
             </property>
             <property name="text">
-             <string>Transport</string>
+             <string>&amp;Transport</string>
             </property>
            </widget>
           </item>
@@ -166,7 +166,7 @@
              <string notr="true">max-width: 140px;</string>
             </property>
             <property name="text">
-             <string>MinT</string>
+             <string>Mi&amp;nT</string>
             </property>
            </widget>
           </item>
@@ -176,7 +176,7 @@
              <string notr="true">max-width: 140px;</string>
             </property>
             <property name="text">
-             <string>Replay</string>
+             <string>&amp;Replay</string>
             </property>
            </widget>
           </item>
@@ -186,7 +186,7 @@
              <string notr="true">max-width: 140px;</string>
             </property>
             <property name="text">
-             <string>Open</string>
+             <string>&amp;Open</string>
             </property>
            </widget>
           </item>
@@ -277,8 +277,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>582</width>
-             <height>857</height>
+             <width>583</width>
+             <height>854</height>
             </rect>
            </property>
           </widget>
@@ -294,8 +294,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>582</width>
-             <height>857</height>
+             <width>583</width>
+             <height>854</height>
             </rect>
            </property>
           </widget>

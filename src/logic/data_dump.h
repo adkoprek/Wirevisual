@@ -34,6 +34,8 @@ private:
     struct std::tm* m_tm;
     std::string m_beam_line;
     std::string m_date;
+    std::vector<float> m_sigma2_h;
+    std::vector<float> m_sigma2_v;
 
     // Functions to fetch some data
     void get_local_time();
@@ -54,4 +56,8 @@ private:
     void add_022_quads();
     void add_022_sigmah();
     void add_022_sigmav();
+
+    // Create other files with mint
+    void move_dat_file();
+    void mint(std::string program, std::string time_stamp);
 };

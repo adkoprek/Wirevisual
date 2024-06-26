@@ -1,14 +1,19 @@
 #include "data_dump.h"
 #include "currents.h"
 #include "data_fetch.h"
+#include <cerrno>
+#include <chrono>
 #include <cmath>
+#include <cstdlib>
 #include <cstring>
 #include <ctime>
 #include <fstream>
 #include <iomanip>
 #include <ios>
 #include <iostream>
+#include <sched.h>
 #include <string>
+#include <thread>
 #include <unistd.h>
 #include <vector>
 #include "epics_commands.h"
@@ -16,8 +21,11 @@
 #include "profiles.h"
 #include "quad_fetch.h"
 #include "quads.h"
+#include <sys/wait.h>
+
 
 #define FILE_BASE_PATH "."
+#define BD_PATH "/proscan/bd/bin/"
 extern int updateTransportFile(char *transLine, int nbDevs, str9 *Quads, int *QuadsSign, float *values,
                         str50 *qerrMsg, int nbProfs, str9 *Profs, str50 *perrMsg, float *sigma2,
                         char *broDev, char *broUnit, float broVal, char *actualTime,
@@ -49,6 +57,8 @@ void DataDump::dump(std::vector<std::string> beam_lines, FITS fit) {
         m_mes_file = new std::ofstream(file_path + ".mes");
         m_022_file = new std::ofstream(file_path + ".022");
 
+        mint("mint-snap", "0");
+
         // Fetch data
         fetch_current_profile_names(); 
         int status = fetch_current();
@@ -71,10 +81,14 @@ void DataDump::dump(std::vector<std::string> beam_lines, FITS fit) {
         create_transport_file();
 
         // Create .022 file
-        *m_022_file << std::setw(10) << std::fixed << std::setprecision(1);
+        *m_022_file << std::fixed << std::setw(10) << std::setprecision(1);
         add_022_quads();
         add_022_sigmah();
         add_022_sigmav();
+
+        // Create MinT files
+        move_dat_file();
+        mint("mint-run", m_date);
 
         m_mes_file->close();
         m_022_file->close();
@@ -95,16 +109,16 @@ std::string DataDump::get_file_path() {
 
     m_date = "";
     m_date += std::to_string(m_tm->tm_year);
-    if (m_tm->tm_mon < 9) m_date += "0";
+    if (m_tm->tm_mon < 10) m_date += "0";
     m_date += std::to_string(m_tm->tm_mon);
-    if (m_tm->tm_mday < 9) m_date += "0";
+    if (m_tm->tm_mday < 10) m_date += "0";
     m_date += std::to_string(m_tm->tm_mday);
     m_date += "_";
-    if (m_tm->tm_hour < 9) m_date += "0";
+    if (m_tm->tm_hour < 10) m_date += "0";
     m_date += std::to_string(m_tm->tm_hour);
-    if (m_tm->tm_min < 9) m_date += "0";
+    if (m_tm->tm_min < 10) m_date += "0";
     m_date += std::to_string(m_tm->tm_min);
-    if (m_tm->tm_sec < 9) m_date += "0";
+    if (m_tm->tm_sec < 10) m_date += "0";
     m_date += std::to_string(m_tm->tm_sec);
 
     file_name += m_beam_line + "_" + m_date;
@@ -267,6 +281,8 @@ void DataDump::create_transport_file() {
                         (char*)"\0", 0, (char*)m_date.c_str(), (char*)file_path.c_str(), message, 
                         &nb_hor, sigma_2_h, &nb_ver, sigma_2_v);
 
+    m_sigma2_h = std::vector<float>(sigma_2_h, sigma_2_h + nb_hor);
+    m_sigma2_v = std::vector<float>(sigma_2_v, sigma_2_v + nb_ver);
 }
 
 void DataDump::add_022_quads() {
@@ -275,20 +291,91 @@ void DataDump::add_022_quads() {
     int k = 0;
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 10; j++) {
+            *m_022_file << std::setw(10);
             if (k >= m_quad_fetch->get_num_valid_measurements())
                 *m_022_file << 0.0;
             else
                 *m_022_file << m_quad_fetch->get_quad(current_quads[k])->field * 1000;
+            k++;
         }
-        k++;
+        *m_022_file << std::endl;
     }
-    *m_022_file << std::endl;
 }
 
 void DataDump::add_022_sigmah() {
-
+    int k = 0;
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 10; j++) {
+            *m_022_file << std::setw(10);
+            if (k >= m_sigma2_h.size())
+                *m_022_file << 0.0;
+            else
+                *m_022_file << m_sigma2_h[k];
+            k++;
+        }
+        *m_022_file << std::endl;
+    }
 }
 
 void DataDump::add_022_sigmav() {
+    int k = 0;
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 10; j++) {
+            *m_022_file << std::setw(10);
+            if (k >= m_sigma2_v.size())
+                *m_022_file << 0.0;
+            else
+                *m_022_file << m_sigma2_v[k];
+            k++;
+        }
+        *m_022_file << std::endl;
+    }
+}
 
+void DataDump::move_dat_file() {
+    std::string temp_dat_file;
+    temp_dat_file += std::string(BD_PATH) + m_beam_line + "/";
+    temp_dat_file += m_beam_line + "_0.dat";
+    int i = 0;
+    while (i < 10) {
+        if (access(temp_dat_file.c_str(), F_OK)) {
+            std::string command = "mv " + temp_dat_file + " "; 
+            command += std::string(BD_PATH) + "/" + m_date + ".dat";
+            char command_str[command.length() + 1];
+            strcpy(command_str, command.c_str());
+            system(command_str);
+            break;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        i++; 
+        if (i == 1) std::cout << "Waiting for snap file ..." << std::endl;
+        if (i >= 10) std::cout << "Giving up, snap file not present" << std::endl;
+    }
+}
+
+void DataDump::mint(std::string program, std::string time_stamp) {
+    pid_t pid = fork();
+
+    if (pid == 0) {
+        char program_str[20], command[128], beam_line[20], time_stamp_str[256];
+        strcpy(program_str, program.c_str());
+        strcpy(beam_line, m_beam_line.c_str());
+        strcpy(command, BD_PATH);
+        strcpy(command, program_str);
+        strcpy(time_stamp_str, time_stamp.c_str());
+        char* options[4];
+        options[0] = command;
+        options[1] = beam_line;
+        options[2] = time_stamp_str;
+        options[3] = NULL;
+        execvp(command, options);
+
+        std::cerr << "An error occured while trying to run \n" << program << "\"";
+        std::cerr << ", " << std::strerror(errno);
+        exit(1);
+    } else if (pid > 0) {} else  {
+        std::cerr << "An error occured while trying to fork the process, ";
+        std::cerr << "continueing without calling mint";
+        return;
+    } 
 }
