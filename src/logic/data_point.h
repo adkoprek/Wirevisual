@@ -18,6 +18,7 @@ typedef struct DataPoint {
     double sigma_4_red;
     double fwhm;
     double fwhm_fit;
+    int direction;
 
     std::vector<double> x;
     std::vector<double> y;

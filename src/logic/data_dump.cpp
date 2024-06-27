@@ -229,16 +229,17 @@ void DataDump::add_mes_profile_data(std::string profile) {
     if (profile[3] == '0') profile.erase(3, 1);
  
     *m_mes_file << std::setprecision(3) << "Profil     " << profile;
-    *m_mes_file << "   offset " << point->offset;
-    *m_mes_file << "   step " << point->step;
-    *m_mes_file << "   nb " << point->x.size();
-    *m_mes_file << "   mean " << point->mean;
-    *m_mes_file << "  meanFit " << point->mean_fit;
-    *m_mes_file << " 4sigma " << point->sigma_4;
+    *m_mes_file << "   offset "  << point->offset;
+    *m_mes_file << "   step "    << point->step;
+    *m_mes_file << "   nb "      << point->x.size();
+    *m_mes_file << "   mean "    << point->mean;
+    *m_mes_file << "  meanFit "  << point->mean_fit;
+    *m_mes_file << " 4sigma "    << point->sigma_4;
     *m_mes_file << " 4sigmaRed " << point->sigma_4_red;
     *m_mes_file << " 4sigmaFit " << point->sigma_4_fit;
-    *m_mes_file << " fwhm " << point->fwhm;
-    *m_mes_file << " fwhmFit " << point->mean_fit << std::endl;
+    *m_mes_file << " fwhm "      << point->fwhm;
+    *m_mes_file << " fwhmFit "   << point->mean_fit;
+    *m_mes_file << "   dir "     << point->direction << std::endl;
 
     add_mes_vector(point->x);
     add_mes_vector(point->y);

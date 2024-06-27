@@ -11,6 +11,7 @@ const std::string PROFILE_PV_SIZE = ":PROF:2:P.NELM";
 const std::string PROFILE_PV_STATUS = ":PSTE:1";
 const std::string PV_ACTIVATE_SCAN = ":PCOM:1";
 const std::string START_COMMAND = "START";
+const std::string PROFILE_PV_DIRECTION = ":DIR:1";
 
 // Other data for files
 const std::string QUADS_PV_ACS = ":SOL:1";

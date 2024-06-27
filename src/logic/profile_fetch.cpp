@@ -45,6 +45,12 @@ int ProfileFetch::fetch(std::string profile_name, DataPoint* profile) {
 #endif // !DEBUG
     
 
+    auto direction = get_direction();
+    if (direction == -2) {
+        std::cerr << "An error occured while fetching the direction of \"" << m_current_profile;
+        std::cerr << "\" but continueing fetching of profile";
+    }
+    profile->direction = direction;
     auto size = get_size_of_profile(); 
     if (size == -1) 
         return -2;
@@ -98,6 +104,20 @@ bool ProfileFetch::scan_finished() {
     if (profile_status == "Idle") return true;
     return false;
     
+}
+
+int ProfileFetch::get_direction() {
+    int direction = 0;
+
+    std::string pv = m_current_profile + PROFILE_PV_DIRECTION;
+    int status = m_cafe->get(pv.c_str(), direction);
+    if (status != ICAFE_NORMAL) {
+        std::cerr << "An error occured while fetching the size of the profile \"";
+        std::cerr << m_current_profile << "\"" << std::endl;
+        return -2;
+    }
+
+    return direction;
 }
 
 int16_t ProfileFetch::get_size_of_profile() {
