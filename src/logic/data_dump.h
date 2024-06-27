@@ -19,7 +19,8 @@ public:
     ~DataDump();
 
     void dump(str_array beam_lines, FITS fit);
-    std::string get_last_data();
+    std::string get_last_date();
+    std::string get_last_human_date();
     
 private:
     CAFE* m_cafe;
@@ -35,6 +36,7 @@ private:
     struct std::tm* m_tm;
     std::string m_beam_line;
     std::string m_date;
+    std::string m_human_date;
     std::vector<float> m_sigma2_h;
     std::vector<float> m_sigma2_v;
 

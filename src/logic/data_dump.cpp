@@ -75,9 +75,11 @@ void DataDump::dump(std::vector<std::string> beam_lines, FITS fit) {
 
         m_quad_fetch->fetch(QUADS.at(m_beam_line));
         add_mes_quads();
+        
 
         // Create all the transport files
         create_transport_file();
+
 
         // Create .022 file
         *m_022_file << std::fixed << std::setw(10) << std::setprecision(1);
@@ -86,8 +88,8 @@ void DataDump::dump(std::vector<std::string> beam_lines, FITS fit) {
         add_022_sigmav();
 
         // Create MinT files
-        move_dat_file();
-        mint("mint-run", m_date);
+        // move_dat_file();
+        // mint("mint-run", m_date);
 
         m_mes_file->close();
         m_022_file->close();
@@ -96,8 +98,12 @@ void DataDump::dump(std::vector<std::string> beam_lines, FITS fit) {
     }
 }
 
-std::string DataDump::get_last_data() {
+std::string DataDump::get_last_date() {
     return m_date;
+}
+
+std::string DataDump::get_last_human_date() {
+    return m_human_date;
 }
 
 void DataDump::get_local_time() {
@@ -164,19 +170,21 @@ int DataDump::fetch_current() {
 }
 
 void DataDump::add_mes_header() {
-    *m_mes_file << "date       \"";
-    if (m_tm->tm_mday < 9) *m_mes_file << "0";
-    *m_mes_file << m_tm->tm_mday << "-";
-    if (m_tm->tm_mon < 9) *m_mes_file << "0";
-    *m_mes_file << m_tm->tm_mon << "-";
-    *m_mes_file << m_tm->tm_year << " ";
-    if (m_tm->tm_hour < 9) *m_mes_file << "0";
-    *m_mes_file << m_tm->tm_hour << ":";
-    if (m_tm->tm_min < 9) *m_mes_file << "0";
-    *m_mes_file << m_tm->tm_min << ":";
-    if (m_tm->tm_sec < 9) *m_mes_file << "0";
-    *m_mes_file << m_tm->tm_sec << "\"" << std::endl;;
+    m_human_date = "";
+    if (m_tm->tm_mday < 10) m_human_date += "0";
+    m_human_date += std::to_string(m_tm->tm_mday) + "-";
+    if (m_tm->tm_mon < 10) m_human_date += "0";
+    m_human_date += std::to_string(m_tm->tm_mon) + "-";
+    m_human_date += std::to_string(m_tm->tm_year);
+    m_human_date += " ";
+    if (m_tm->tm_hour < 10) m_human_date += "0";
+    m_human_date += std::to_string(m_tm->tm_hour) + ":";
+    if (m_tm->tm_min < 10) m_human_date += "0";
+    m_human_date += std::to_string(m_tm->tm_min) + ":";
+    if (m_tm->tm_sec < 10) m_human_date += "0";
+    m_human_date += std::to_string(m_tm->tm_sec);
 
+    *m_mes_file << "date       \"" << m_human_date << "\"" << std::endl;
     *m_mes_file << "current    " << m_current_monitor << "   ";
     *m_mes_file << std::setprecision(1) << m_current;
     *m_mes_file << "   " << m_current_unit << std::endl;
@@ -340,7 +348,6 @@ void DataDump::move_dat_file() {
     std::string temp_dat_file;
     temp_dat_file += std::string(getenv("TRANSMESS")) + "/" + m_beam_line + "/";
     temp_dat_file += m_beam_line + "_0.dat";
-    std::cout << "The temp dat file path: " << temp_dat_file << std::endl;
     int i = 0;
     while (i < 10) {
         if (access(temp_dat_file.c_str(), F_OK) == 0) {
@@ -376,10 +383,12 @@ void DataDump::mint(std::string program, std::string time_stamp) {
         options[3] = NULL;
         execvp(command, options);
 
+        std::cout << "Saved successfully 1" << std::endl;
         std::cerr << "An error occured while trying to run \n" << program << "\"";
         std::cerr << ", " << std::strerror(errno);
         exit(1);
     } else if (pid > 0) {} else  {
+        std::cout << "Saved successfully 2" << std::endl;
         std::cerr << "An error occured while trying to fork the process, ";
         std::cerr << "continueing without calling mint";
         return;

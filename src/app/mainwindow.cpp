@@ -15,6 +15,8 @@
 #include <cstdlib>
 #include <QThread>
 #include <cstring>
+#include <iomanip>
+#include <ios>
 #include <iterator>
 #include <QListWidget>
 #include <qcoreevent.h>
@@ -68,7 +70,22 @@ void MainWindow::custom_ui_setup() {
     m_diagram_layout_2 = new QVBoxLayout();
     ui.scrollAreaWidgetContents->setLayout(m_diagram_layout_1);
     ui.scrollAreaWidgetContents_2->setLayout(m_diagram_layout_2);
-
+    
+    auto palette = ui.legend_1->palette();
+    palette.setColor(ui.legend_1->foregroundRole(), Qt::black);
+    ui.legend_1->setPalette(palette);
+    palette = ui.legend_2->palette();
+    palette.setColor(ui.legend_2->foregroundRole(), m_colors[0]);
+    ui.legend_2->setPalette(palette);
+    palette = ui.legend_3->palette();
+    palette.setColor(ui.legend_3->foregroundRole(), m_colors[1]);
+    ui.legend_3->setPalette(palette);
+    palette = ui.legend_4->palette();
+    palette.setColor(ui.legend_4->foregroundRole(), m_colors[2]);
+    ui.legend_4->setPalette(palette);
+    palette = ui.legend_5->palette();
+    palette.setColor(ui.legend_5->foregroundRole(), m_colors[3]);
+    ui.legend_5->setPalette(palette);
 
     create_overlay();
 }
@@ -94,6 +111,11 @@ void MainWindow::create_overlay() {
 
 void MainWindow::resizeEvent(QResizeEvent* event) {
     m_loading_overlay->setGeometry(0, 0, this->width(), this->height());
+
+    for (auto const& [profile, plot] : m_plots) {
+        plot->setMinimumHeight(this->height() * 0.4);
+        plot->setMaximumHeight(this->height() * 0.4);
+    }
 }
 
 void MainWindow::on_beamline_clicked(QListWidgetItem* item) {
@@ -258,7 +280,7 @@ void MainWindow::on_mint_clicked() {
         strcat(mint_file, "/");
         strcat(mint_file, m_selected_beamlines[0].c_str());
         strcat(mint_file, "_");
-        strcat(mint_file, m_data_dump->get_last_data().c_str());
+        strcat(mint_file, m_data_dump->get_last_date().c_str());
         strcat(mint_file, ".mint");
 
 	std::cout << "MinT file: " << mint_file << std::endl;
@@ -275,10 +297,12 @@ void MainWindow::on_mint_clicked() {
 
 void MainWindow::on_replay_clicked() {
     if (m_busy) return;
+    if (ui.keep->isChecked() && m_plot_index > 3) return;
     measure();
 }
 
 void MainWindow::on_open_clicked() {
+    if (ui.keep->isChecked() && m_plot_index > 3) return;
     static QString selected_filter = "All Transprof Files (*.mes)";
     QString file_name = QFileDialog::getOpenFileName(this,
                                           "Open Transprof File",
@@ -371,6 +395,7 @@ void MainWindow::create_diagrams() {
     }
 
     m_loading_widget->set_text("Createing the diagrams");
+    m_plot_index = 0;
 
     while (auto item = m_diagram_layout_1->takeAt(0)) {
         auto widget = item->widget();
@@ -387,6 +412,7 @@ void MainWindow::create_diagrams() {
     }
 
     m_plots.clear();
+    m_plot_zoomer.clear();
 
     std::vector<std::string> failed_profiles;
 
@@ -398,10 +424,16 @@ void MainWindow::create_diagrams() {
         if (point->valid_data) {
             plot->setTitle(QString(point->name.c_str()));
             plot->insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
+            plot->setAxisAutoScale(QwtPlot::xBottom);
+            plot->setAxisAutoScale(QwtPlot::yLeft);
 
             QwtPlotCurve* curve_real = new QwtPlotCurve("Curve 1");
             curve_real->setSamples(point->x.data(), point->y.data(), static_cast<int>(point->x.size()));
-            curve_real->setTitle("Measured Data");
+            std::stringstream stream;
+            stream << "2σ = " << std::fixed << std::setprecision(1);
+            stream << round(point->sigma_4_fit / 2 * 10) / 10;
+            stream << ", μ = " << round(point->mean_fit * 10) / 10;
+            curve_real->setTitle(QString(stream.str().c_str()));
             curve_real->attach(plot);
 
             QwtPlotCurve* curve_fit = new QwtPlotCurve("Curve 2");
@@ -412,15 +444,18 @@ void MainWindow::create_diagrams() {
         }
         else {
             plot->setTitle(QString((point->name + " - Corrupted").c_str()));
+            plot->insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
             failed_profiles.push_back(point->name);
         } 
 
-        QwtPlotZoomer* zoomer = new QwtPlotZoomer(plot->canvas());
+        QwtPlotZoomer* zoomer = new QwtPlotZoomer(QwtPlot::xBottom, QwtPlot::yLeft, plot->canvas());
+        zoomer->setZoomBase(true);
 
         plot->setMinimumHeight(this->height() * 0.4);
         plot->setMaximumHeight(this->height() * 0.4);
         plot->replot();
         m_plots.insert({point->name, plot});
+        m_plot_zoomer.insert({point->name, zoomer});
 
         int profile_number = point->name[3] * 10 + point->name[4];
         if (profile_number % 2 == 0) 
@@ -429,6 +464,16 @@ void MainWindow::create_diagrams() {
             m_diagram_layout_2->addWidget(plot);
     }
 
+    ui.legend_2->setText("Fit");
+    ui.legend_3->setText("");
+    ui.legend_4->setText("");
+    ui.legend_5->setText("");
+    set_legend(ui.legend_1);
+    auto palette = ui.legend_2->palette();
+    palette.setColor(ui.legend_2->foregroundRole(), Qt::red);
+    ui.legend_2->setPalette(palette);
+
+
     if (failed_profiles.size() != 0) {
         std::string message = "The program faild to get the profile";
         if (failed_profiles.size() > 1) message += "s";
@@ -436,6 +481,7 @@ void MainWindow::create_diagrams() {
         for (int i = 0; i < (failed_profiles.size() - 1); i++) {
             message += failed_profiles[i] + "\n";
         }
+
         message += failed_profiles[failed_profiles.size() - 1];
         QMessageBox* message_box = new QMessageBox();
         message_box->setText(QString(message.c_str()));
@@ -456,6 +502,7 @@ void MainWindow::add_to_diagrams() {
     }
 
 
+
     if (m_data_fetch->was_canceled()) {
         m_loading_overlay->hide();
         m_busy = false;
@@ -463,6 +510,7 @@ void MainWindow::add_to_diagrams() {
     }
 
     m_loading_widget->set_text("Createing the diagrams");
+
 
     for (auto const& [profile, plot] : m_plots) {
         if (!m_data_fetch->point_exists(profile)) continue;
@@ -477,18 +525,51 @@ void MainWindow::add_to_diagrams() {
             }
         }
 
-        QwtPlotCurve* curve_real = new QwtPlotCurve("Curve 3");
+
+        QwtPlotCurve* curve_real = new QwtPlotCurve("Curve");
         curve_real->setSamples(point->x.data(), point->y.data(), static_cast<int>(point->x.size()));
-        curve_real->setTitle("Measured Data 2");
-        curve_real->setPen(QPen(Qt::yellow));
+        std::stringstream stream;
+        stream << "2σ = " << std::fixed << std::setprecision(1);
+        stream << round(point->sigma_4_fit / 2 * 10) / 10;
+        stream << ", μ = " << round(point->mean_fit * 10) / 10;
+        curve_real->setTitle(QString(stream.str().c_str()));
+        curve_real->setPen(QPen(m_colors[m_plot_index]));
         curve_real->attach(plot);
 
+        plot->setAxisAutoScale(QwtPlot::xBottom);
+        plot->setAxisAutoScale(QwtPlot::yLeft);
+        plot->updateAxes();
+        plot->replot();
+        auto zoomer = m_plot_zoomer.at(profile);
+        zoomer->setZoomBase(true);
 
         plot->replot();
     }
 
+    if  (m_plot_index == 0) {
+        set_legend(ui.legend_2);
+        auto palette = ui.legend_2->palette();
+        palette.setColor(ui.legend_2->foregroundRole(), m_colors[0]);
+        ui.legend_2->setPalette(palette);
+        palette = ui.legend_2->palette();
+    }
+    else if (m_plot_index == 1) set_legend(ui.legend_3);
+    else if (m_plot_index == 2) set_legend(ui.legend_4);
+    else if (m_plot_index == 3) set_legend(ui.legend_5);
+
+    m_plot_index++;
     m_loading_overlay->hide();
     m_busy = false;
+}
+
+void MainWindow::set_legend(QLabel* legend) {
+    if (m_from_file) {
+        FileHeader* header = m_data_fetch->get_file_header();
+        std::string text = header->date + " " + header->time;
+        legend->setText(QString(text.c_str()));
+    }
+    else
+        legend->setText(QString(m_data_dump->get_last_human_date().c_str()));
 }
 
 void MainWindow::reset_beamlines() {

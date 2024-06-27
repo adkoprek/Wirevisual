@@ -2,6 +2,7 @@
 #include <QMainWindow>
 #include <map>
 #include <qlistwidget.h>
+#include <qnamespace.h>
 #include <qobjectdefs.h>
 #include <QVBoxLayout>
 #include <qthread.h>
@@ -13,6 +14,7 @@
 #include "../../forms/ui_mainwindow.h"
 #include "loading_widget.h"
 #include "qwt_plot.h"
+#include "qwt_plot_zoomer.h"
 #include "worker.h"
 
 
@@ -53,6 +55,7 @@ private:
     void reset_beamlines();
     void add_profile(std::string beam_line, std::string profile);
     void save();
+    void set_legend(QLabel* legend);
     
     Ui::MainWindow ui;
     DataFetch* m_data_fetch;
@@ -69,6 +72,9 @@ private:
     QWidget* m_loading_overlay;
     LoadingWidget* m_loading_widget;
     DataDump* m_data_dump;
+    int m_plot_index = 0;
     std::map<std::string, QwtPlot*> m_plots;
+    std::map<std::string, QwtPlotZoomer*> m_plot_zoomer;
+    std::vector<Qt::GlobalColor> m_colors = {Qt::green, Qt::blue, Qt::darkMagenta, Qt::cyan};
 };
 

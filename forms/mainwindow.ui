@@ -171,6 +171,16 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="quad_button">
+            <property name="styleSheet">
+             <string notr="true">max-width: 140px;</string>
+            </property>
+            <property name="text">
+             <string>&amp;Dump quads</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="transport_button">
             <property name="styleSheet">
              <string notr="true">max-width: 140px;</string>
@@ -252,6 +262,44 @@
            </widget>
           </item>
           <item>
+           <widget class="QLabel" name="legend_1">
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="legend_2">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="legend_3">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="legend_4">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="legend_5">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QCheckBox" name="scrollTogether">
             <property name="styleSheet">
              <string notr="true">max-width: 140px;</string>
@@ -287,8 +335,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>583</width>
-             <height>854</height>
+             <width>582</width>
+             <height>857</height>
             </rect>
            </property>
           </widget>
@@ -304,8 +352,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>583</width>
-             <height>854</height>
+             <width>582</width>
+             <height>857</height>
             </rect>
            </property>
           </widget>
