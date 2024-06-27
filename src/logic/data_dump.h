@@ -19,6 +19,7 @@ public:
     ~DataDump();
 
     void dump(str_array beam_lines, FITS fit);
+    void dump_quads(str_array beam_lines, FITS fit);
     std::string get_last_date();
     std::string get_last_human_date();
     

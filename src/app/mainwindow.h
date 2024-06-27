@@ -43,6 +43,7 @@ public slots:
     void on_mint_clicked();
     void on_replay_clicked();
     void on_open_clicked();
+    void on_quad_dump_clicked();
 
     void create_diagrams();
     void add_to_diagrams();
@@ -54,7 +55,7 @@ private:
     void measure();
     void reset_beamlines();
     void add_profile(std::string beam_line, std::string profile);
-    void save();
+    void save(bool just_quads);
     void set_legend(QLabel* legend);
     
     Ui::MainWindow ui;

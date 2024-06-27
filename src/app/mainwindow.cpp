@@ -21,6 +21,7 @@
 #include <QListWidget>
 #include <qcoreevent.h>
 #include <qlist.h>
+#include <qlistwidget.h>
 #include <qmessagebox.h>
 #include <qnamespace.h>
 #include <qobject.h>
@@ -61,6 +62,7 @@ void MainWindow::custom_ui_setup() {
     connect(ui.mint_button,      &QPushButton::clicked,     this, &MainWindow::on_mint_clicked);
     connect(ui.remeasure_button, &QPushButton::clicked,     this, &MainWindow::on_replay_clicked);
     connect(ui.open_button,      &QPushButton::clicked,     this, &MainWindow::on_open_clicked);
+    connect(ui.quad_button,      &QPushButton::clicked,     this, &MainWindow::on_quad_dump_clicked);
     connect(ui.scrollArea->verticalScrollBar(),     &QScrollBar::valueChanged, this, &MainWindow::sync_scroll);
     connect(ui.scrollArea_2->verticalScrollBar(),   &QScrollBar::valueChanged, this, &MainWindow::sync_scroll);
 
@@ -346,6 +348,25 @@ void MainWindow::on_open_clicked() {
     else create_diagrams();
 }
 
+void MainWindow::on_quad_dump_clicked() {
+    if (m_busy) return;
+    if (!m_selected.size()) return;
+    m_selected_beamlines.clear();
+    for (int i = 0; i < ui.beamline_list->count(); i++) {
+        QListWidgetItem* item = ui.beamline_list->item(i);
+        if (item->checkState() == Qt::Checked)
+            m_selected_beamlines.push_back(item->text().toStdString());
+    }
+    m_selected.clear();
+    reset_beamlines();
+    save(true);
+    QMessageBox* message_box = new QMessageBox();
+    message_box->setText("Quads saved");
+    message_box->setStandardButtons(QMessageBox::Ok);
+    m_loading_overlay->hide();
+    message_box->exec();
+}
+
 void MainWindow::measure() {
     m_from_file = false;
     m_busy = true;
@@ -356,7 +377,7 @@ void MainWindow::measure() {
     m_work_tread = new QThread();
     m_worker = new Worker([this]{ 
         m_data_fetch->fetch(m_to_fetch); 
-        if (!m_data_fetch->was_canceled()) save();
+        if (!m_data_fetch->was_canceled()) save(false);
     });
     m_worker->moveToThread(m_work_tread);
     connect(m_work_tread, &QThread::started, m_worker, &Worker::execute_work);
@@ -367,7 +388,7 @@ void MainWindow::measure() {
     m_work_tread->start();
 }
 
-void MainWindow::save() {
+void MainWindow::save(bool just_quads) {
     FITS fit;
 
     if (ui.fit_2sigma->isChecked()) fit = FITS::TWO_SIGMA;
@@ -376,7 +397,8 @@ void MainWindow::save() {
     else if (ui.fit_fwhm->isChecked()) fit = FITS::FWHM;
     else if (ui.fit_fwhm_fit->isChecked()) fit = FITS::FWHM_FIT;
 
-    m_data_dump->dump(m_selected_beamlines, fit);
+    if (just_quads) m_data_dump->dump_quads(m_selected_beamlines, fit);
+    else m_data_dump->dump(m_selected_beamlines, fit);
 }
 
 void MainWindow::create_diagrams() {

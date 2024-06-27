@@ -98,6 +98,35 @@ void DataDump::dump(std::vector<std::string> beam_lines, FITS fit) {
     }
 }
 
+void DataDump::dump_quads(std::vector<std::string> beam_lines, FITS fit) {
+    m_fit = fit;
+    get_local_time();
+
+    for (int i = 0; i < beam_lines.size(); i++) {
+        m_beam_line = beam_lines[i];
+        auto file_path = get_file_path();
+        m_mes_file = new std::ofstream(file_path + ".mes");
+
+        // Fetch data
+        fetch_current_profile_names(); 
+        int status = fetch_current();
+        if (status != 0) {
+            std::cerr << "The previous error is not acceptable skipping beamline \"";
+            std::cerr << m_beam_line << "\"" << std::endl;;
+            continue;
+        }
+
+        // Create .mes file
+        *m_mes_file << std::fixed << std::showpoint;
+        add_mes_header();
+        m_quad_fetch->fetch(QUADS.at(m_beam_line));
+        add_mes_quads();
+
+        m_mes_file->close();
+        delete m_mes_file;
+    }
+}
+
 std::string DataDump::get_last_date() {
     return m_date;
 }
