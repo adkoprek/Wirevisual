@@ -1,10 +1,18 @@
-#include "mainwindow.h"
-#include "data_dump.h"
-#include "data_fetch.h"
-#include "fits.h"
-#include "loading_widget.h"
-#include "profiles.h"
-#include "worker.h"
+//  _    _ _                _                 _ 
+// | |  | (_)              (_)               | |
+// | |  | |_ _ __ _____   ___ ___ _   _  __ _| |
+// | |/\| | | '__/ _ \ \ / / / __| | | |/ _` | |
+// \  /\  / | | |  __/\ V /| \__ \ |_| | (_| | |
+//  \/  \/|_|_|  \___| \_/ |_|___/\__,_|\__,_|_|
+//    https://git.psi.ch/hipa_apps/Wirevisual
+//
+// Implements the main window UI and is responsible
+// for all proceses
+//
+//
+// @Author: Adam Koprek
+// @Maintainer: Jochem Snuverink
+
 #include <QWidget>
 #include <QScrollBar>
 #include <QMainWindow>
@@ -36,14 +44,29 @@
 #include <qwt_legend.h>
 #include <qwt_plot_zoomer.h>
 
+#include "mainwindow.h"
+#include "data_dump.h"
+#include "data_fetch.h"
+#include "fits.h"
+#include "loading_widget.h"
+#include "profiles.h"
+#include "worker.h"
+
 #define BD_PATH "/hipa/bd/bin/"
 
+
+/************************************************************
+*                       public
+************************************************************/
+
+// Constructor
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     m_data_fetch = new DataFetch();
     custom_ui_setup();
     m_data_dump = new DataDump(m_data_fetch);
 }
 
+// Deconstructor
 MainWindow::~MainWindow() {
     delete m_data_dump;
     delete m_data_fetch;
@@ -52,84 +75,19 @@ MainWindow::~MainWindow() {
     delete m_loading_overlay;
 }
 
-void MainWindow::custom_ui_setup() {
-    ui.setupUi(this);
-    ui.fit_2sigmafit->click();
-    connect(ui.beamline_list,    &QListWidget::itemClicked, this, &MainWindow::on_beamline_clicked);
-    connect(ui.beamline_list,    &QListWidget::itemChanged, this, &MainWindow::on_beamline_selected);
-    connect(ui.profile_list,     &QListWidget::itemChanged, this, &MainWindow::on_profile_selected);
-    connect(ui.measure_button,   &QPushButton::clicked,     this, &MainWindow::on_measure_clicked);
-    connect(ui.transport_button, &QPushButton::clicked,     this, &MainWindow::on_transport_clicked);
-    connect(ui.mint_button,      &QPushButton::clicked,     this, &MainWindow::on_mint_clicked);
-    connect(ui.remeasure_button, &QPushButton::clicked,     this, &MainWindow::on_replay_clicked);
-    connect(ui.open_button,      &QPushButton::clicked,     this, &MainWindow::on_open_clicked);
-    connect(ui.quad_button,      &QPushButton::clicked,     this, &MainWindow::on_quad_dump_clicked);
-    connect(ui.scrollArea->verticalScrollBar(),     &QScrollBar::valueChanged, this, &MainWindow::sync_scroll);
-    connect(ui.scrollArea_2->verticalScrollBar(),   &QScrollBar::valueChanged, this, &MainWindow::sync_scroll);
-
-    on_beamline_clicked(ui.beamline_list->item(0));
-
-    m_diagram_layout_1 = new QVBoxLayout();
-    m_diagram_layout_2 = new QVBoxLayout();
-    ui.scrollAreaWidgetContents->setLayout(m_diagram_layout_1);
-    ui.scrollAreaWidgetContents_2->setLayout(m_diagram_layout_2);
-
-    auto palette = ui.legend_1->palette();
-    palette.setColor(ui.legend_1->foregroundRole(), Qt::black);
-    ui.legend_1->setPalette(palette);
-    palette = ui.legend_2->palette();
-    palette.setColor(ui.legend_2->foregroundRole(), m_colors[0]);
-    ui.legend_2->setPalette(palette);
-    palette = ui.legend_3->palette();
-    palette.setColor(ui.legend_3->foregroundRole(), m_colors[1]);
-    ui.legend_3->setPalette(palette);
-    palette = ui.legend_4->palette();
-    palette.setColor(ui.legend_4->foregroundRole(), m_colors[2]);
-    ui.legend_4->setPalette(palette);
-    palette = ui.legend_5->palette();
-    palette.setColor(ui.legend_5->foregroundRole(), m_colors[3]);
-    ui.legend_5->setPalette(palette);
-
-    create_overlay();
-}
-
-void MainWindow::create_overlay() {
-    m_loading_overlay = new QWidget(this);
-    m_loading_overlay->setGeometry(this->geometry());
-    m_loading_overlay->setStyleSheet("background-color: rgba(0, 0, 0, 0.5)");
-    auto loading_layout = new QGridLayout();
-    m_loading_overlay->setLayout(loading_layout);
-
-    m_loading_widget = new LoadingWidget(m_data_fetch);
-    m_loading_widget->set_text("Loading the profiles");
-    loading_layout->addWidget(m_loading_widget);
-
-    connect(m_loading_widget, &LoadingWidget::cancel_clicked,   this, &MainWindow::on_cancel_clicked);
-    connect(m_loading_widget, &LoadingWidget::stop_clicked,     this, &MainWindow::on_stop_clicked);
-    connect(m_loading_widget, &LoadingWidget::resume_clicked,   this, &MainWindow::on_resume_clicked);
-
-    m_loading_overlay->hide();
-}
-
-void MainWindow::resizeEvent(QResizeEvent* event) {
-    m_loading_overlay->setGeometry(0, 0, this->width(), this->height());
-
-    for (auto const& [profile, plot] : m_plots) {
-        plot->setMinimumHeight(this->height() * 0.4);
-        plot->setMaximumHeight(this->height() * 0.4);
-    }
-}
-
+// Called when an elment from the beamline list is clicked
 void MainWindow::on_beamline_clicked(QListWidgetItem* item) {
     std::string selected_item(item->text().toUtf8().constData());
     auto profiles_to_display = &PROFILES.at(selected_item);
 
+    // Add the profile names to the ui
     ui.profile_list->clear();
     for (size_t i = 0; i < profiles_to_display->size(); i++) {
         auto profile_name = profiles_to_display->at(i);
         auto item = new QListWidgetItem(tr(profile_name.c_str()));
         item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
 
+        // Check if profile is selected and addapt to it
         auto element_index = std::find(m_selected.begin(), m_selected.end(),
                 selected_item + "/" + profile_name);
         if (element_index != m_selected.end())
@@ -141,6 +99,7 @@ void MainWindow::on_beamline_clicked(QListWidgetItem* item) {
     }
 }
 
+// Called when an elment from the beam_line list is checked
 void MainWindow::on_beamline_selected(QListWidgetItem* item) {
     ui.beamline_list->setCurrentItem(item);
 
@@ -153,6 +112,7 @@ void MainWindow::on_beamline_selected(QListWidgetItem* item) {
     auto profiles_to_display = &PROFILES.at(selected_item);
     bool checked = item->checkState() == Qt::Checked;
 
+    // Add every profile of that beamline
     for (size_t i = 0; i < profiles_to_display->size(); i++) {
         auto profile_name = profiles_to_display->at(i);
         auto element_index = std::find(m_selected.begin(), m_selected.end(),
@@ -168,15 +128,18 @@ void MainWindow::on_beamline_selected(QListWidgetItem* item) {
 
     }
 
+    // Also switch to that item
     on_beamline_clicked(ui.beamline_list->item(std::distance(PROFILES.begin(), PROFILES.find(selected_item))));
 }
 
+// Called when an elment from the profile list is clicked
 void MainWindow::on_profile_selected(QListWidgetItem* item) {
     ui.profile_list->setCurrentItem(item);
     QListWidgetItem* current_beamline_item = ui.beamline_list->currentItem();
     std::string current_beamline(current_beamline_item->text().toUtf8().constData());
     std::string selected_item(item->text().toUtf8().constData());
 
+    // Add the profile and its beamlien name to the selected
     auto element_index = std::find(m_selected.begin(), m_selected.end(),
                 current_beamline + "/" + selected_item);
 
@@ -191,6 +154,7 @@ void MainWindow::on_profile_selected(QListWidgetItem* item) {
     }
 }
 
+// Called when one of the QScrollWidgets scrolls vertically 
 void MainWindow::sync_scroll(int value) {
     if (!ui.scrollTogether->isChecked()) return;
     if (sender() == ui.scrollArea->verticalScrollBar())
@@ -199,11 +163,14 @@ void MainWindow::sync_scroll(int value) {
         ui.scrollArea->verticalScrollBar()->setValue(value);
 }
 
+// Called when the measure button is clicked
 void MainWindow::on_measure_clicked() {
     if (m_busy) return;
     if (!m_selected.size()) return;
     m_to_fetch.clear();
     m_selected_beamlines.clear();
+
+    // Remove the beamline prefix and only append the profiles once
     for (int i = 0; i < m_selected.size(); i++) {
         std::stringstream ss(m_selected[i]);
         std::string part;
@@ -225,11 +192,15 @@ void MainWindow::on_measure_clicked() {
     }
     m_selected.clear();
     reset_beamlines();
+
+    // Measure should always replace everything
     ui.keep->setCheckState(Qt::Unchecked);
 
     measure();
 }
 
+// Called when the cancel button is clicked
+// @note only possible in the beginning
 void MainWindow::on_cancel_clicked() {
     if (!m_busy) return;
     m_loading_widget->set_text("Canceling");
@@ -238,6 +209,7 @@ void MainWindow::on_cancel_clicked() {
     m_data_fetch->resume();
 }
 
+// Called when the stop button is clicked
 void MainWindow::on_stop_clicked() {
     if (!m_busy) return;
     m_loading_widget->set_text("Stopped, tap resume to continue");
@@ -245,6 +217,7 @@ void MainWindow::on_stop_clicked() {
     m_data_fetch->stop();
 }
 
+// Called when the resume button is clicked
 void MainWindow::on_resume_clicked() {
     if (!m_busy) return;
     m_data_fetch->resume();
@@ -252,9 +225,11 @@ void MainWindow::on_resume_clicked() {
     m_loading_widget->start();
 }
 
+// Called when the transport button is clicked
 void MainWindow::on_transport_clicked() {
     pid_t pid = fork();
 
+    // Open transport in a child process
     if (pid == 0) {
         char command[128];
         const char* program = "loadtrans";
@@ -270,9 +245,11 @@ void MainWindow::on_transport_clicked() {
     } else {}
 }
 
+// Called when the MinT button is clicked
 void MainWindow::on_mint_clicked() {
     pid_t pid = fork();
 
+    // Open the last gernerated .mint file of this session
     if (pid == 0) {
         char mint_file[512];
         char* file_folder = getenv("TRANSMESS");
@@ -297,16 +274,23 @@ void MainWindow::on_mint_clicked() {
     } else {}
 }
 
+// Called when the replay button is clicked
 void MainWindow::on_replay_clicked() {
+    // This function doesn't look for what is selected
+    // but takes the old m_to_fetch
+
     if (m_busy) return;
     if (ui.keep->isChecked() && m_plot_index > 3) return;
     if (m_to_fetch.size() == 0) return;
     measure();
 }
 
+// Called when the open button is clicked
 void MainWindow::on_open_clicked() {
     if (ui.keep->isChecked() && m_plot_index > 3) return;
     if (ui.keep->isChecked() && m_to_fetch.size() == 0) return;
+
+    // Open file explorer to open a .mes file
     static QString selected_filter = "All Transprof Files (*.mes)";
     QString file_name = QFileDialog::getOpenFileName(this,
                                           "Open Transprof File",
@@ -343,7 +327,7 @@ void MainWindow::on_open_clicked() {
         return;
     }
 
-
+    // Add to the plots
     FileHeader* header = m_data_fetch->get_file_header();
     m_to_fetch = header->profile_names;
     m_from_file = true;
@@ -351,6 +335,7 @@ void MainWindow::on_open_clicked() {
     else create_diagrams();
 }
 
+// Called when the quad dump button is clicked
 void MainWindow::on_quad_dump_clicked() {
     if (m_busy) return;
     if (!m_selected.size()) return;
@@ -369,40 +354,7 @@ void MainWindow::on_quad_dump_clicked() {
     message_box->exec();
 }
 
-void MainWindow::measure() {
-    m_from_file = false;
-    m_busy = true;
-    m_loading_widget->set_text("Loading the profiles");
-    m_loading_widget->start();
-    m_loading_overlay->show();
-
-    m_work_tread = new QThread();
-    m_worker = new Worker([this]{
-        m_data_fetch->fetch(m_to_fetch);
-        if (!m_data_fetch->was_canceled()) save(false);
-    });
-    m_worker->moveToThread(m_work_tread);
-    connect(m_work_tread, &QThread::started, m_worker, &Worker::execute_work);
-    if (ui.keep->isChecked())
-        connect(m_worker, &Worker::work_done, this, &MainWindow::add_to_diagrams, Qt::QueuedConnection);
-    else
-        connect(m_worker, &Worker::work_done, this, &MainWindow::create_diagrams, Qt::QueuedConnection);
-    m_work_tread->start();
-}
-
-void MainWindow::save(bool just_quads) {
-    FITS fit;
-
-    if (ui.fit_2sigma->isChecked()) fit = FITS::TWO_SIGMA;
-    else if (ui.fit_2sigmareduced->isChecked()) fit = FITS::TWO_SIGMA_RED;
-    else if (ui.fit_2sigmafit->isChecked()) fit = FITS::TWO_SIGMA_FIT;
-    else if (ui.fit_fwhm->isChecked()) fit = FITS::FWHM;
-    else if (ui.fit_fwhm_fit->isChecked()) fit = FITS::FWHM_FIT;
-
-    if (just_quads) m_data_dump->dump_quads(m_selected_beamlines, fit);
-    else m_data_dump->dump(m_selected_beamlines, fit);
-}
-
+// Called to create diagrams after measuring or opening
 void MainWindow::create_diagrams() {
     if (!m_from_file) {
         delete m_worker;
@@ -410,7 +362,6 @@ void MainWindow::create_diagrams() {
         m_work_tread->wait();
         delete m_work_tread;
     }
-
 
     if (m_data_fetch->was_canceled()) {
         m_loading_widget->stop();
@@ -447,6 +398,7 @@ void MainWindow::create_diagrams() {
 
         QwtPlot* plot = new QwtPlot();
 
+        // Only plot the data if valid data otherwise show that corrupted
         if (point->valid_data) {
             plot->setTitle(QString(point->name.c_str()));
             plot->insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
@@ -522,6 +474,7 @@ void MainWindow::create_diagrams() {
     m_busy = false;
 }
 
+// Called to add lienes to existing diagrams
 void MainWindow::add_to_diagrams() {
     if (!m_from_file) {
         delete m_worker;
@@ -541,7 +494,7 @@ void MainWindow::add_to_diagrams() {
 
     m_loading_widget->set_text("Creating the diagrams");
 
-
+    // Whwn more than one plot is presented remove the fit
     for (auto const& [profile, plot] : m_plots) {
         if (!m_data_fetch->point_exists(profile)) continue;
         auto point = m_data_fetch->get_data_point(profile);
@@ -554,7 +507,6 @@ void MainWindow::add_to_diagrams() {
                 delete curve;
             }
         }
-
 
         QwtPlotCurve* curve_real = new QwtPlotCurve("Curve");
         curve_real->setSamples(point->x.data(), point->y.data(), static_cast<int>(point->x.size()));
@@ -595,6 +547,131 @@ void MainWindow::add_to_diagrams() {
     m_busy = false;
 }
 
+/************************************************************
+*                       private
+************************************************************/
+
+// Setup the ui
+void MainWindow::custom_ui_setup() {
+    ui.setupUi(this);
+    ui.fit_2sigmafit->click();
+
+    // Connect ui elements with the slots
+    connect(ui.beamline_list,    &QListWidget::itemClicked, this, &MainWindow::on_beamline_clicked);
+    connect(ui.beamline_list,    &QListWidget::itemChanged, this, &MainWindow::on_beamline_selected);
+    connect(ui.profile_list,     &QListWidget::itemChanged, this, &MainWindow::on_profile_selected);
+    connect(ui.measure_button,   &QPushButton::clicked,     this, &MainWindow::on_measure_clicked);
+    connect(ui.transport_button, &QPushButton::clicked,     this, &MainWindow::on_transport_clicked);
+    connect(ui.mint_button,      &QPushButton::clicked,     this, &MainWindow::on_mint_clicked);
+    connect(ui.remeasure_button, &QPushButton::clicked,     this, &MainWindow::on_replay_clicked);
+    connect(ui.open_button,      &QPushButton::clicked,     this, &MainWindow::on_open_clicked);
+    connect(ui.quad_button,      &QPushButton::clicked,     this, &MainWindow::on_quad_dump_clicked);
+    connect(ui.scrollArea->verticalScrollBar(),     &QScrollBar::valueChanged, this, &MainWindow::sync_scroll);
+    connect(ui.scrollArea_2->verticalScrollBar(),   &QScrollBar::valueChanged, this, &MainWindow::sync_scroll);
+
+    // Click on first beamline for the profiles to appear
+    on_beamline_clicked(ui.beamline_list->item(0));
+
+    // Create the layout for the diagrams
+    m_diagram_layout_1 = new QVBoxLayout();
+    m_diagram_layout_2 = new QVBoxLayout();
+    ui.scrollAreaWidgetContents->setLayout(m_diagram_layout_1);
+    ui.scrollAreaWidgetContents_2->setLayout(m_diagram_layout_2);
+
+    // Set the color for every legend element
+    auto palette = ui.legend_1->palette();
+    palette.setColor(ui.legend_1->foregroundRole(), Qt::black);
+    ui.legend_1->setPalette(palette);
+    palette = ui.legend_2->palette();
+    palette.setColor(ui.legend_2->foregroundRole(), m_colors[0]);
+    ui.legend_2->setPalette(palette);
+    palette = ui.legend_3->palette();
+    palette.setColor(ui.legend_3->foregroundRole(), m_colors[1]);
+    ui.legend_3->setPalette(palette);
+    palette = ui.legend_4->palette();
+    palette.setColor(ui.legend_4->foregroundRole(), m_colors[2]);
+    ui.legend_4->setPalette(palette);
+    palette = ui.legend_5->palette();
+    palette.setColor(ui.legend_5->foregroundRole(), m_colors[3]);
+    ui.legend_5->setPalette(palette);
+
+    create_overlay();
+}
+
+// Create the overlay widget with LoadingWidget from loading_widget.h
+void MainWindow::create_overlay() {
+    // Create a parent
+    m_loading_overlay = new QWidget(this);
+    m_loading_overlay->setGeometry(this->geometry());
+    m_loading_overlay->setStyleSheet("background-color: rgba(0, 0, 0, 0.5)");
+    auto loading_layout = new QGridLayout();
+    m_loading_overlay->setLayout(loading_layout);
+
+    m_loading_widget = new LoadingWidget(m_data_fetch);
+    m_loading_widget->set_text("Loading the profiles");
+    loading_layout->addWidget(m_loading_widget);
+
+    // Connect the buttons from the LoadingWidget with the slots
+    connect(m_loading_widget, &LoadingWidget::cancel_clicked,   this, &MainWindow::on_cancel_clicked);
+    connect(m_loading_widget, &LoadingWidget::stop_clicked,     this, &MainWindow::on_stop_clicked);
+    connect(m_loading_widget, &LoadingWidget::resume_clicked,   this, &MainWindow::on_resume_clicked);
+
+    m_loading_overlay->hide();
+}
+
+// Implementation of the QMainWindow resize event
+void MainWindow::resizeEvent(QResizeEvent* event) {
+    // Resize the overlay
+    m_loading_overlay->setGeometry(0, 0, this->width(), this->height());
+
+    // Resize the height of the plot so that every plot has the same size
+    for (auto const& [profile, plot] : m_plots) {
+        plot->setMinimumHeight(this->height() * 0.4);
+        plot->setMaximumHeight(this->height() * 0.4);
+    }
+}
+
+// Setup Worker from worker.h and fetch data with DataFetch from logic/data_fetch.h
+void MainWindow::measure() {
+    m_from_file = false;
+    m_busy = true;
+    m_loading_widget->set_text("Loading the profiles");
+    m_loading_widget->start();
+    m_loading_overlay->show();
+
+    // Create a new thread and worker, move the worker on the thread
+    m_work_tread = new QThread();
+    m_worker = new Worker([this]{
+        m_data_fetch->fetch(m_to_fetch);
+        if (!m_data_fetch->was_canceled()) save(false);
+    });
+    m_worker->moveToThread(m_work_tread);
+
+    // Connect the appropriate on finish signals
+    connect(m_work_tread, &QThread::started, m_worker, &Worker::execute_work);
+    if (ui.keep->isChecked())
+        connect(m_worker, &Worker::work_done, this, &MainWindow::add_to_diagrams, Qt::QueuedConnection);
+    else
+        connect(m_worker, &Worker::work_done, this, &MainWindow::create_diagrams, Qt::QueuedConnection);
+    m_work_tread->start();
+}
+
+// Save the fetched data to a file with DataDump from data_dumb.h
+void MainWindow::save(bool just_quads) {
+    FITS fit;
+
+    if (ui.fit_2sigma->isChecked()) fit = FITS::TWO_SIGMA;
+    else if (ui.fit_2sigmareduced->isChecked()) fit = FITS::TWO_SIGMA_RED;
+    else if (ui.fit_2sigmafit->isChecked()) fit = FITS::TWO_SIGMA_FIT;
+    else if (ui.fit_fwhm->isChecked()) fit = FITS::FWHM;
+    else if (ui.fit_fwhm_fit->isChecked()) fit = FITS::FWHM_FIT;
+
+    if (just_quads) m_data_dump->dump_quads(m_selected_beamlines, fit);
+    else m_data_dump->dump(m_selected_beamlines, fit);
+}
+
+
+// Set one of the five legend elements based on m_polt_index
 void MainWindow::set_legend(QLabel* legend) {
     if (m_from_file) {
         FileHeader* header = m_data_fetch->get_file_header();
@@ -605,6 +682,7 @@ void MainWindow::set_legend(QLabel* legend) {
         legend->setText(QString(m_data_dump->get_last_human_date().c_str()));
 }
 
+// Unselect every beamline
 void MainWindow::reset_beamlines() {
     for (size_t i = 0; i < BEAM_LINES.size(); i++) {
         ui.beamline_list->item(i)->setCheckState(Qt::Unchecked);
@@ -612,6 +690,8 @@ void MainWindow::reset_beamlines() {
     on_beamline_clicked(ui.beamline_list->currentItem());
 }
 
+// Add a profile to the m_selected vector 
+// This functions sorts the data in the same order as on the screen
 void MainWindow::add_profile(std::string beam_line, std::string profile) {
     if (m_selected.size() == 0) {
         m_selected.push_back(beam_line + "/" + profile);
@@ -629,7 +709,6 @@ void MainWindow::add_profile(std::string beam_line, std::string profile) {
         if (index_of_selected <= index_of_current) break;
         index++;
     }
-
 
     if (index < m_selected.size()) {
         bool ca_excec = true;

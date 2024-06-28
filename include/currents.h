@@ -1,5 +1,19 @@
-#pragma once
+//  _    _ _                _                 _ 
+// | |  | (_)              (_)               | |
+// | |  | |_ _ __ _____   ___ ___ _   _  __ _| |
+// | |/\| | | '__/ _ \ \ / / / __| | | |/ _` | |
+// \  /\  / | | |  __/\ V /| \__ \ |_| | (_| | |
+//  \/  \/|_|_|  \___| \_/ |_|___/\__,_|\__,_|_|
+//    https://git.psi.ch/hipa_apps/Wirevisual
+//
+// Holds the names for the current monitors of every
+// beamline
+//
+//
+// @Author: Adam Koprek
+// @Maintainer: Jochem Snuverink
 
+#pragma once
 #include <map>
 #include <string>
 
