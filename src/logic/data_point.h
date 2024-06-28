@@ -12,7 +12,7 @@
 // profile from epics but also the calculated data
 //
 // @Author: Adam Koprek
-// @Maintainer: Jochem Snuvernik
+// @Maintainer: Jochem Snuverink
 
 #pragma once
 #include <string>

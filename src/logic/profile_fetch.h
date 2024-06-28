@@ -14,7 +14,7 @@
 // just ignore it was the advise of the maker
 //
 // @Author: Adam Koprek
-// @Maintainer: Jochem Snuvernik
+// @Maintainer: Jochem Snuverink
 
 #pragma once
 #include <cstdint>

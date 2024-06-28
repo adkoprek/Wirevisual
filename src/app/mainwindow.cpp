@@ -36,6 +36,7 @@
 #include <qwt_legend.h>
 #include <qwt_plot_zoomer.h>
 
+#define BD_PATH "/hipa/bd/bin/"
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     m_data_fetch = new DataFetch();
@@ -52,8 +53,8 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::custom_ui_setup() {
-    ui.setupUi(this);                       
-    ui.fit_2sigmafit->click();              
+    ui.setupUi(this);
+    ui.fit_2sigmafit->click();
     connect(ui.beamline_list,    &QListWidget::itemClicked, this, &MainWindow::on_beamline_clicked);
     connect(ui.beamline_list,    &QListWidget::itemChanged, this, &MainWindow::on_beamline_selected);
     connect(ui.profile_list,     &QListWidget::itemChanged, this, &MainWindow::on_profile_selected);
@@ -72,7 +73,7 @@ void MainWindow::custom_ui_setup() {
     m_diagram_layout_2 = new QVBoxLayout();
     ui.scrollAreaWidgetContents->setLayout(m_diagram_layout_1);
     ui.scrollAreaWidgetContents_2->setLayout(m_diagram_layout_2);
-    
+
     auto palette = ui.legend_1->palette();
     palette.setColor(ui.legend_1->foregroundRole(), Qt::black);
     ui.legend_1->setPalette(palette);
@@ -99,10 +100,10 @@ void MainWindow::create_overlay() {
     auto loading_layout = new QGridLayout();
     m_loading_overlay->setLayout(loading_layout);
 
-    m_loading_widget = new LoadingWidget(m_data_fetch); 
+    m_loading_widget = new LoadingWidget(m_data_fetch);
     m_loading_widget->set_text("Loading the profiles");
     loading_layout->addWidget(m_loading_widget);
-    
+
     connect(m_loading_widget, &LoadingWidget::cancel_clicked,   this, &MainWindow::on_cancel_clicked);
     connect(m_loading_widget, &LoadingWidget::stop_clicked,     this, &MainWindow::on_stop_clicked);
     connect(m_loading_widget, &LoadingWidget::resume_clicked,   this, &MainWindow::on_resume_clicked);
@@ -122,19 +123,19 @@ void MainWindow::resizeEvent(QResizeEvent* event) {
 void MainWindow::on_beamline_clicked(QListWidgetItem* item) {
     std::string selected_item(item->text().toUtf8().constData());
     auto profiles_to_display = &PROFILES.at(selected_item);
-    
+
     ui.profile_list->clear();
     for (size_t i = 0; i < profiles_to_display->size(); i++) {
         auto profile_name = profiles_to_display->at(i);
         auto item = new QListWidgetItem(tr(profile_name.c_str()));
         item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-        
-        auto element_index = std::find(m_selected.begin(), m_selected.end(), 
+
+        auto element_index = std::find(m_selected.begin(), m_selected.end(),
                 selected_item + "/" + profile_name);
-        if (element_index != m_selected.end()) 
-            item->setCheckState(Qt::Checked); 
+        if (element_index != m_selected.end())
+            item->setCheckState(Qt::Checked);
         else
-            item->setCheckState(Qt::Unchecked); 
+            item->setCheckState(Qt::Unchecked);
 
         ui.profile_list->insertItem(i, item);
     }
@@ -151,20 +152,20 @@ void MainWindow::on_beamline_selected(QListWidgetItem* item) {
     std::string selected_item(item->text().toUtf8().constData());
     auto profiles_to_display = &PROFILES.at(selected_item);
     bool checked = item->checkState() == Qt::Checked;
-    
+
     for (size_t i = 0; i < profiles_to_display->size(); i++) {
         auto profile_name = profiles_to_display->at(i);
-        auto element_index = std::find(m_selected.begin(), m_selected.end(), 
+        auto element_index = std::find(m_selected.begin(), m_selected.end(),
                 selected_item + "/" + profile_name);
         if (element_index == m_selected.end()) {
             if (checked)
                 add_profile(selected_item, profile_name);
         }
         else {
-            if (!checked) 
+            if (!checked)
                 m_selected.erase(element_index);
         }
-        
+
     }
 
     on_beamline_clicked(ui.beamline_list->item(std::distance(PROFILES.begin(), PROFILES.find(selected_item))));
@@ -176,10 +177,10 @@ void MainWindow::on_profile_selected(QListWidgetItem* item) {
     std::string current_beamline(current_beamline_item->text().toUtf8().constData());
     std::string selected_item(item->text().toUtf8().constData());
 
-    auto element_index = std::find(m_selected.begin(), m_selected.end(), 
+    auto element_index = std::find(m_selected.begin(), m_selected.end(),
                 current_beamline + "/" + selected_item);
 
-    if (element_index != m_selected.end()) 
+    if (element_index != m_selected.end())
         m_selected.erase(element_index);
     else
         add_profile(current_beamline, selected_item);
@@ -192,9 +193,9 @@ void MainWindow::on_profile_selected(QListWidgetItem* item) {
 
 void MainWindow::sync_scroll(int value) {
     if (!ui.scrollTogether->isChecked()) return;
-    if (sender() == ui.scrollArea->verticalScrollBar()) 
+    if (sender() == ui.scrollArea->verticalScrollBar())
         ui.scrollArea_2->verticalScrollBar()->setValue(value);
-    else if (sender() == ui.scrollArea_2->verticalScrollBar()) 
+    else if (sender() == ui.scrollArea_2->verticalScrollBar())
         ui.scrollArea->verticalScrollBar()->setValue(value);
 }
 
@@ -239,7 +240,7 @@ void MainWindow::on_cancel_clicked() {
 
 void MainWindow::on_stop_clicked() {
     if (!m_busy) return;
-    m_loading_widget->set_text("Stoped, tap resume to continue");
+    m_loading_widget->set_text("Stopped, tap resume to continue");
     m_loading_widget->stop();
     m_data_fetch->stop();
 }
@@ -267,7 +268,7 @@ void MainWindow::on_transport_clicked() {
         std::cerr << "Failed to open transport";
         exit(1);
     } else {}
-} 
+}
 
 void MainWindow::on_mint_clicked() {
     pid_t pid = fork();
@@ -284,7 +285,7 @@ void MainWindow::on_mint_clicked() {
         strcat(mint_file, m_data_dump->get_last_date().c_str());
         strcat(mint_file, ".mint");
 
-	std::cout << "MinT file: " << mint_file << std::endl;
+        std::cout << "MinT file: " << mint_file << std::endl;
 
         char* options[2];
         options[0] = mint_file;
@@ -376,8 +377,8 @@ void MainWindow::measure() {
     m_loading_overlay->show();
 
     m_work_tread = new QThread();
-    m_worker = new Worker([this]{ 
-        m_data_fetch->fetch(m_to_fetch); 
+    m_worker = new Worker([this]{
+        m_data_fetch->fetch(m_to_fetch);
         if (!m_data_fetch->was_canceled()) save(false);
     });
     m_worker->moveToThread(m_work_tread);
@@ -412,14 +413,14 @@ void MainWindow::create_diagrams() {
 
 
     if (m_data_fetch->was_canceled()) {
-        m_loading_widget->stop();       
+        m_loading_widget->stop();
         m_loading_widget->stop();
         m_loading_overlay->hide();
         m_busy = false;
         return;
     }
 
-    m_loading_widget->set_text("Createing the diagrams");
+    m_loading_widget->set_text("Creating the diagrams");
     m_plot_index = 0;
 
     while (auto item = m_diagram_layout_1->takeAt(0)) {
@@ -471,7 +472,7 @@ void MainWindow::create_diagrams() {
             plot->setTitle(QString((point->name + " - Corrupted").c_str()));
             plot->insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
             failed_profiles.push_back(point->name);
-        } 
+        }
 
         QwtPlotZoomer* zoomer = new QwtPlotZoomer(QwtPlot::xBottom, QwtPlot::yLeft, plot->canvas());
         zoomer->setZoomBase(true);
@@ -483,7 +484,7 @@ void MainWindow::create_diagrams() {
         m_plot_zoomer.insert({point->name, zoomer});
 
         int profile_number = point->name[3] * 10 + point->name[4];
-        if (profile_number % 2 == 0) 
+        if (profile_number % 2 == 0)
             m_diagram_layout_1->addWidget(plot);
         else
             m_diagram_layout_2->addWidget(plot);
@@ -538,7 +539,7 @@ void MainWindow::add_to_diagrams() {
         return;
     }
 
-    m_loading_widget->set_text("Createing the diagrams");
+    m_loading_widget->set_text("Creating the diagrams");
 
 
     for (auto const& [profile, plot] : m_plots) {
@@ -631,7 +632,7 @@ void MainWindow::add_profile(std::string beam_line, std::string profile) {
 
 
     if (index < m_selected.size()) {
-        bool ca_excec = true; 
+        bool ca_excec = true;
 
         if (index < (m_selected.size() - 1)) {
             std::stringstream ss(m_selected[index + 1]);
@@ -649,7 +650,7 @@ void MainWindow::add_profile(std::string beam_line, std::string profile) {
                 std::stringstream ss(m_selected[i]);
                 int count = 0;
                 while (getline(ss, current_profile, '/')) {
-                    if (count == 1) break; 
+                    if (count == 1) break;
                     count++;
                 }
                 auto index_of_current = std::find(current_profiles.begin(), current_profiles.end(), current_profile);

@@ -9,11 +9,11 @@
 // Gaussian fit functions for a profile measurement
 //
 // This is an adaptation of the functions developed by
-// Anton Metzger for the Transprofs project and are reused
+// Anton Mezger for the Transprofs project and are reused
 // here
 //
-// @Author: Anton Metzger
-// @Maintainer: Jochem Snuvernik
+// @Author: Anton Mezger
+// @Maintainer: Jochem Snuverink
 
 #include <cmath>
 #include <stdlib.h>

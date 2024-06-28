@@ -13,7 +13,7 @@
 // to stop this operatiion because it's fast
 //
 // @Author: Adam Koprek
-// @Maintainer: Jochem Snuvernik
+// @Maintainer: Jochem Snuverink
 
 #pragma once
 #include <string>

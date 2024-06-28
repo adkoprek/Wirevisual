@@ -12,7 +12,7 @@
 // profile names while being able to stop, resume and cancel
 //
 // @Author: Adam Koprek
-// @Maintainer: Jochem Snuvernik
+// @Maintainer: Jochem Snuverink
 
 #pragma once
 #include <condition_variable>

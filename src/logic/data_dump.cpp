@@ -1,4 +1,4 @@
-//  _    _ _                _                 _ 
+//  _    _ _                _                 _
 // | |  | (_)              (_)               | |
 // | |  | |_ _ __ _____   ___ ___ _   _  __ _| |
 // | |/\| | | '__/ _ \ \ / / / __| | | |/ _` | |
@@ -6,15 +6,15 @@
 //  \/  \/|_|_|  \___| \_/ |_|___/\__,_|\__,_|_|
 //    https://git.psi.ch/hipa_apps/Wirevisual
 //
-// Class to dump the measured tada from DataFetch into files
+// Class to dump the measured data from DataFetch into files
 //
 // The files that are generated are to be used by other programs
-// like Transport and MinT. The files are generated in the 
-// directory stored int the env variable $TRANSMESS which should 
+// like Transport and MinT. The files are generated in the
+// directory stored in the env variable $TRANSMESS which should
 // be at default /hipa/op/data/TransMess
 //
 // @Author: Adam Koprek
-// @Maintainer: Jochem Snuvernik
+// @Maintainer: Jochem Snuverink
 
 #include <cerrno>
 #include <chrono>
@@ -43,10 +43,10 @@
 #include <sys/wait.h>
 
 
-// The path whre external executables for HIPA are located
+// The path where external executables for HIPA are located
 #define BD_PATH "/hipa/bd/bin/"
 
-// The external function developed by metzger, look in create_trasnport.cpp
+// The external function developed by Mezger, look in create_transport.cpp
 extern int updateTransportFile(char *transLine, int nbDevs, str9 *Quads, int *QuadsSign, float *values,
                         str50 *qerrMsg, int nbProfs, str9 *Profs, str50 *perrMsg, float *sigma2,
                         char *broDev, char *broUnit, float broVal, char *actualTime,
@@ -94,7 +94,7 @@ void DataDump::dump(std::vector<std::string> beam_lines, FITS fit) {
         mint("mint-snap", "0");
 
         // Fetch data
-        fetch_current_profile_names(); 
+        fetch_current_profile_names();
         int status = fetch_current();
         if (status != 0) {
             std::cerr << "The previous error is not acceptable skipping beamline \"";
@@ -142,7 +142,7 @@ void DataDump::dump_quads(std::vector<std::string> beam_lines, FITS fit) {
         m_mes_file = new std::ofstream(file_path + ".mes");
 
         // Fetch data
-        fetch_current_profile_names(); 
+        fetch_current_profile_names();
         int status = fetch_current();
         if (status != 0) {
             std::cerr << "The previous error is not acceptable skipping beamline \"";
@@ -166,7 +166,7 @@ std::string DataDump::get_last_date() {
     return m_date;
 }
 
-// Get the last human readeble data that is used in the file headers
+// Get the last human readable data that is used in the file headers
 std::string DataDump::get_last_human_date() {
     return m_human_date;
 }
@@ -217,11 +217,11 @@ void DataDump::fetch_current_profile_names() {
     for (int i = 0; i < profiles.size(); i++) {
         if (m_data_fetch->point_exists(profiles[i])) {
             if (m_data_fetch->get_data_point(profiles[i])->valid_data)
-                m_current_profile_names.push_back(profiles[i]); 
+                m_current_profile_names.push_back(profiles[i]);
         }
     }
 }
-    
+
 // Fetch the value and unit of the current monitor of the current beamline
 int DataDump::fetch_current() {
     m_current_monitor = CURENTS.at(m_beam_line);
@@ -270,16 +270,16 @@ void DataDump::add_mes_header() {
     *m_mes_file << "beamline   " << m_beam_line << std::endl;
     *m_mes_file << "impuls     ??????   0.000000   \"\"" << std::endl;
     *m_mes_file << "option     " << FIT_NAMES.at(m_fit) << std::endl;
-    *m_mes_file << "nbprofs    " << m_current_profile_names.size() << std::endl; 
+    *m_mes_file << "nbprofs    " << m_current_profile_names.size() << std::endl;
 }
 
-// Add the actual profile measurement data with some data about 
+// Add the actual profile measurement data with some data about
 // every valid profile to the .mes file
 void DataDump::add_mes_profile_data(std::string profile) {
     auto point = m_data_fetch->get_data_point(profile);
     if (!point->valid_data) return;
     if (profile[3] == '0') profile.erase(3, 1);
- 
+
     *m_mes_file << std::setprecision(3) << "Profil     " << profile;
     *m_mes_file << "   offset "  << point->offset;
     *m_mes_file << "   step "    << point->step;
@@ -302,7 +302,7 @@ void DataDump::add_mes_profile_data(std::string profile) {
 // Add the vector data for the x, y or fit values of a profile
 void DataDump::add_mes_vector(std::vector<double> data) {
     *m_mes_file << "           " << std::setprecision(6);
-    for (int i = 0; i < data.size(); i++) 
+    for (int i = 0; i < data.size(); i++)
         *m_mes_file << data[i] << " ";
     *m_mes_file << std::endl;
 }
@@ -311,7 +311,7 @@ void DataDump::add_mes_vector(std::vector<double> data) {
 void DataDump::add_mes_quads() {
     auto current_quads = QUADS.at(m_beam_line);
 
-    *m_mes_file << "quaddacs   " << m_quad_fetch->get_num_valid_measurements() << std::endl;;   
+    *m_mes_file << "quaddacs   " << m_quad_fetch->get_num_valid_measurements() << std::endl;;
     for (int i = 0; i < current_quads.size(); i++) {
         auto quad = m_quad_fetch->get_quad(current_quads[i]);
         if (!quad->valid_data) continue;
@@ -321,7 +321,7 @@ void DataDump::add_mes_quads() {
     *m_mes_file << std::endl;
 
     *m_mes_file << std::setprecision(4);
-    *m_mes_file << "quadfields " << m_quad_fetch->get_num_valid_measurements() << std::endl;;   
+    *m_mes_file << "quadfields " << m_quad_fetch->get_num_valid_measurements() << std::endl;;
     for (int i = 0; i < current_quads.size(); i++) {
         auto quad = m_quad_fetch->get_quad(current_quads[i]);
         if (!quad->valid_data) continue;
@@ -330,7 +330,7 @@ void DataDump::add_mes_quads() {
     }
     *m_mes_file << std::endl;
 
-    *m_mes_file << "quadamps " << m_quad_fetch->get_num_valid_measurements() << std::endl;;   
+    *m_mes_file << "quadamps " << m_quad_fetch->get_num_valid_measurements() << std::endl;;
     for (int i = 0; i < current_quads.size(); i++) {
         auto quad = m_quad_fetch->get_quad(current_quads[i]);
         if (!quad->valid_data) continue;
@@ -363,7 +363,7 @@ void DataDump::create_transport_file() {
 
     for (int i = 0; i < m_current_profile_names.size(); i++) {
         strcpy((char*)&profs_arr[i], m_current_profile_names[i].c_str());
-        if (m_fit == FITS::TWO_SIGMA) 
+        if (m_fit == FITS::TWO_SIGMA)
             sigma_2[i] = 2 * m_data_fetch->get_data_point(m_current_profile_names[i])->sigma_4;
         else if (m_fit == FITS::TWO_SIGMA_RED)
             sigma_2[i] = 2 * m_data_fetch->get_data_point(m_current_profile_names[i])->sigma_4_red;
@@ -376,9 +376,9 @@ void DataDump::create_transport_file() {
         else sigma_2[i] = 999;
     }
 
-    updateTransportFile((char*)m_beam_line.c_str(), current_quads.size(), quads_arr, quad_sign, 
-                        values, querrMsg, num_profiles, profs_arr, perrMsg, sigma_2, (char*)"??????", 
-                        (char*)"\0", 0, (char*)m_date.c_str(), (char*)file_path.c_str(), message, 
+    updateTransportFile((char*)m_beam_line.c_str(), current_quads.size(), quads_arr, quad_sign,
+                        values, querrMsg, num_profiles, profs_arr, perrMsg, sigma_2, (char*)"??????",
+                        (char*)"\0", 0, (char*)m_date.c_str(), (char*)file_path.c_str(), message,
                         &nb_hor, sigma_2_h, &nb_ver, sigma_2_v);
 
     m_sigma2_h = std::vector<float>(sigma_2_h, sigma_2_h + nb_hor);
@@ -421,7 +421,7 @@ void DataDump::add_022_sigma(std::vector<float> data) {
 }
 
 // Move local .dat file gnerated by mint-snap to the right location
-// mint-snap is an external program that is responsible for dumping 
+// mint-snap is an external program that is responsible for dumping
 // some data from HIPA to a .dat file
 // The target file name isl
 // <beamline>/<beamline>_<date computed above>.dat
@@ -432,7 +432,7 @@ void DataDump::move_dat_file() {
     int i = 0;
     while (i < 10) {
         if (access(temp_dat_file.c_str(), F_OK) == 0) {
-            std::string command = "mv " + temp_dat_file + " "; 
+            std::string command = "mv " + temp_dat_file + " ";
             command += std::string(getenv("TRANSMESS")) + "/"  + m_beam_line + "/" + m_beam_line + "_" + m_date + ".dat";
             char command_str[command.length() + 1];
             std::cout << "Move command: " << command << std::endl;
@@ -441,7 +441,7 @@ void DataDump::move_dat_file() {
             break;
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        i++; 
+        i++;
         if (i == 1) std::cout << "Waiting for snap file ..." << std::endl;
         if (i >= 10) std::cout << "Giving up, snap file not present" << std::endl;
     }
@@ -470,7 +470,7 @@ void DataDump::mint(std::string program, std::string time_stamp) {
         exit(1);
     } else if (pid > 0) {} else  {
         std::cerr << "An error occured while trying to fork the process, ";
-        std::cerr << "continueing without calling mint";
+        std::cerr << "continuing without calling mint";
         return;
-    } 
+    }
 }

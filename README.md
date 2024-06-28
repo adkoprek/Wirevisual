@@ -2,7 +2,7 @@
 
 ---
 
-Generic qt scan appilication for HIPA
+Generic qt scan application for HIPA
 
 Author: Adam Koprek adam.koprek@psi.ch
 
@@ -10,6 +10,7 @@ Author: Adam Koprek adam.koprek@psi.ch
 
 - Qt5
 - Epics Libraries
+- Qwt
 - Cafe: [GitLab Repo](https://git.psi.ch/cafe)
 
 ## Build

@@ -1,4 +1,4 @@
-//  _    _ _                _                 _ 
+//  _    _ _                _                 _
 // | |  | (_)              (_)               | |
 // | |  | |_ _ __ _____   ___ ___ _   _  __ _| |
 // | |/\| | | '__/ _ \ \ / / / __| | | |/ _` | |
@@ -8,14 +8,14 @@
 //
 // Wrapper class around the fit function in fitting.cpp
 //
-// These class can make some prediction about the 
-// gaussian function fit parameters that would suit 
-// the profile the best and then pass them of the fit 
+// These class can make some prediction about the
+// gaussian function fit parameters that would suit
+// the profile the best and then pass them of the fit
 // function that can create a better fit
 //
 // @Author: Adam Koprek
-// @Inspired by: Anton Metzger
-// @Maintainer: Jochem Snuvernik
+// @Inspired by: Anton Mezger
+// @Maintainer: Jochem Snuverink
 
 #include <cmath>
 #include <vector>
@@ -68,7 +68,7 @@ std::vector<float> ProfileAnalyze::fit() {
 
     // Fit the points
     FunctionFit(2, m_x.data(), y_data.data(), m_y.size(), estimation, result, error, fit_y, &chisqr, &Nparam, fiterr);
-    
+
     // If the offset was negativ fit again with other function
     if (result[3] < 0) {
         result[3] = 0;
@@ -122,7 +122,7 @@ void ProfileAnalyze::find_maximum() {
     m_area_80 = m_area * 0.8;
 }
 
-// Metzget called it like that
+// Mezger called it like that
 void ProfileAnalyze::find_interesting_positions() {
     double temp_point;
     bool half_height_found = false;

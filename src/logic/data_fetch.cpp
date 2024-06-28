@@ -12,7 +12,7 @@
 // profile names while being able to stop, resume and cancel
 //
 // @Author: Adam Koprek
-// @Maintainer: Jochem Snuvernik
+// @Maintainer: Jochem Snuverink
 
 #include <condition_variable>
 #include <cstddef>
@@ -135,7 +135,7 @@ std::string DataFetch::get_current_profile() {
 }
 
 // Load an .mes fieles content
-// @Inspired by: Jochem Snuvernik
+// @Inspired by: Jochem Snuverink
 int DataFetch::load(std::string file_name) {
     std::ifstream file;
     std::string dummy;

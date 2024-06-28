@@ -12,7 +12,7 @@
 // quadrupole magnet short quad from epics
 //
 // @Author: Adam Koprek
-// @Maintainer: Jochem Snuvernik
+// @Maintainer: Jochem Snuverink
 
 #pragma once
 #include <string>

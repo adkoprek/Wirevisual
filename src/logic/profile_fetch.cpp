@@ -1,4 +1,4 @@
-//  _    _ _                _                 _ 
+//  _    _ _                _                 _
 // | |  | (_)              (_)               | |
 // | |  | |_ _ __ _____   ___ ___ _   _  __ _| |
 // | |/\| | | '__/ _ \ \ / / / __| | | |/ _` | |
@@ -14,7 +14,7 @@
 // just ignore it was the advise of the maker
 //
 // @Author: Adam Koprek
-// @Maintainer: Jochem Snuvernik
+// @Maintainer: Jochem Snuverink
 
 #include <cmath>
 #include <cstdint>
@@ -37,7 +37,7 @@
 
 // Constructor
 ProfileFetch::ProfileFetch() {
-    m_cafe = new CAFE();                       
+    m_cafe = new CAFE();
     m_cafe->channelOpenPolicy.setTimeout(1.0);  // Set timuout for cafe
 }
 
@@ -56,7 +56,7 @@ int ProfileFetch::fetch(std::string profile_name, DataPoint* profile) {
     // This code block activates a scan
     // It is advised to disable it with #define DEBUG
     // when not runing the code directly on the HIPA machine
-    // because you are otherwise not allowed to write to the EPICS 
+    // because you are otherwise not allowed to write to the EPICS
     // server even on hipalc
 
     // If profile is a harp it doesn't have to be activated
@@ -66,7 +66,7 @@ int ProfileFetch::fetch(std::string profile_name, DataPoint* profile) {
 
         // Wait for the scan to finish
         while (i < 50) {
-            if (scan_finished()) 
+            if (scan_finished())
                 break;
 
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -78,25 +78,25 @@ int ProfileFetch::fetch(std::string profile_name, DataPoint* profile) {
             return -1;
     }
 #endif // !DEBUG
-    
+
 
     // Fetch the direction of the profile
     auto direction = get_direction();
     if (direction == -2) {
         // That data is not required so it can be skipped
         std::cerr << "An error occured while fetching the direction of \"" << m_current_profile;
-        std::cerr << "\" but continueing fetching of profile";
+        std::cerr << "\" but continuing fetching of profile";
     }
     profile->direction = direction;
 
-    auto size = get_size_of_profile(); 
-    if (size == -1) 
+    auto size = get_size_of_profile();
+    if (size == -1)
         return -2;
 
     // Define stard arrays because cafe only works with these
     double x_data[size];
     double y_data[size];
-    
+
     // Fetche the data points
     auto return_code = load_profile_data(x_data, y_data);
     if (return_code != 0)
@@ -108,7 +108,7 @@ int ProfileFetch::fetch(std::string profile_name, DataPoint* profile) {
     // Convert the arras to standart vectors
     profile->x = std::vector<double>(x_data, x_data + size);
     profile->y = std::vector<double>(y_data, y_data + size);
-    profile->valid_data = true;  
+    profile->valid_data = true;
 
     return 0;
 }
@@ -148,7 +148,7 @@ bool ProfileFetch::scan_finished() {
     // When a profile is in Idle mode it has finished
     if (profile_status == "Idle") return true;
     return false;
-    
+
 }
 
 // Get the direction in which the scan was made
@@ -189,9 +189,9 @@ int ProfileFetch::load_profile_data(double* x_data, double* y_data) {
     std::string pv_y;
 
     // A harp has a special PV for the y data
-    if (m_current_profile[2] == 'H') 
+    if (m_current_profile[2] == 'H')
         pv_y = m_current_profile + HARP_PV_Y;
-    else 
+    else
         pv_y = m_current_profile + PROFILE_PV_Y;
 
     // You have to put your pv and handles into an array to work

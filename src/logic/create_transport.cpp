@@ -12,8 +12,8 @@
 // into a .001 file that can be interpreted by transport
 // an external program
 //
-// @Author: Anton Metzger
-// @Maintainer: Jochem Snuvernik
+// @Author: Anton Mezger
+// @Maintainer: Jochem Snuverink
 
 #include <cstdlib>
 #include <stdio.h>

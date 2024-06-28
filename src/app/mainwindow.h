@@ -18,8 +18,6 @@
 #include "worker.h"
 
 
-#define BD_PATH "/hipa/bd/bin/"
-
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -57,7 +55,7 @@ private:
     void add_profile(std::string beam_line, std::string profile);
     void save(bool just_quads);
     void set_legend(QLabel* legend);
-    
+
     Ui::MainWindow ui;
     DataFetch* m_data_fetch;
     std::vector<std::string> m_selected;
@@ -78,4 +76,3 @@ private:
     std::map<std::string, QwtPlotZoomer*> m_plot_zoomer;
     std::vector<Qt::GlobalColor> m_colors = {Qt::darkGreen, Qt::blue, Qt::darkMagenta, Qt::darkCyan};
 };
-
