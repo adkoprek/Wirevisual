@@ -38,8 +38,8 @@
 
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
-    custom_ui_setup();
     m_data_fetch = new DataFetch();
+    custom_ui_setup();
     m_data_dump = new DataDump(m_data_fetch);
 }
 
@@ -99,9 +99,8 @@ void MainWindow::create_overlay() {
     auto loading_layout = new QGridLayout();
     m_loading_overlay->setLayout(loading_layout);
 
-    m_loading_widget = new LoadingWidget(); 
+    m_loading_widget = new LoadingWidget(m_data_fetch); 
     m_loading_widget->set_text("Loading the profiles");
-    m_loading_widget->start();
     loading_layout->addWidget(m_loading_widget);
     
     connect(m_loading_widget, &LoadingWidget::cancel_clicked,   this, &MainWindow::on_cancel_clicked);
@@ -300,16 +299,18 @@ void MainWindow::on_mint_clicked() {
 void MainWindow::on_replay_clicked() {
     if (m_busy) return;
     if (ui.keep->isChecked() && m_plot_index > 3) return;
+    if (m_to_fetch.size() == 0) return;
     measure();
 }
 
 void MainWindow::on_open_clicked() {
     if (ui.keep->isChecked() && m_plot_index > 3) return;
+    if (ui.keep->isChecked() && m_to_fetch.size() == 0) return;
     static QString selected_filter = "All Transprof Files (*.mes)";
     QString file_name = QFileDialog::getOpenFileName(this,
                                           "Open Transprof File",
                                           getenv("TRANSMESS"),
-                                          "870 (b860*.mes);;"
+                                          "860 (b860*.mes);;"
                                           "BCE (bce*.mes);;"
                                           "BW2 (bw2*.mes);;"
                                           "BX1 (bx1*.mes);;"
@@ -341,6 +342,7 @@ void MainWindow::on_open_clicked() {
         return;
     }
 
+
     FileHeader* header = m_data_fetch->get_file_header();
     m_to_fetch = header->profile_names;
     m_from_file = true;
@@ -363,7 +365,6 @@ void MainWindow::on_quad_dump_clicked() {
     QMessageBox* message_box = new QMessageBox();
     message_box->setText("Quads saved");
     message_box->setStandardButtons(QMessageBox::Ok);
-    m_loading_overlay->hide();
     message_box->exec();
 }
 
@@ -411,6 +412,8 @@ void MainWindow::create_diagrams() {
 
 
     if (m_data_fetch->was_canceled()) {
+        m_loading_widget->stop();       
+        m_loading_widget->stop();
         m_loading_overlay->hide();
         m_busy = false;
         return;
@@ -511,7 +514,10 @@ void MainWindow::create_diagrams() {
         m_loading_overlay->hide();
         message_box->exec();
     }
-    m_loading_overlay->hide();
+    if (!m_from_file) {
+        m_loading_overlay->hide();
+        m_loading_widget->stop();
+    }
     m_busy = false;
 }
 
@@ -527,6 +533,7 @@ void MainWindow::add_to_diagrams() {
 
     if (m_data_fetch->was_canceled()) {
         m_loading_overlay->hide();
+        m_loading_widget->stop();
         m_busy = false;
         return;
     }
@@ -580,7 +587,10 @@ void MainWindow::add_to_diagrams() {
     else if (m_plot_index == 3) set_legend(ui.legend_5);
 
     m_plot_index++;
-    m_loading_overlay->hide();
+    if (!m_from_file) {
+        m_loading_overlay->hide();
+        m_loading_widget->stop();
+    }
     m_busy = false;
 }
 

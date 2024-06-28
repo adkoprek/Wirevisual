@@ -19,6 +19,7 @@ public:
     bool data_ready = false;
 
     void fetch(std::vector<std::string> profiles);
+    std::string get_current_profile();
     int load(std::string file_name);
     void stop();
     void resume();
@@ -35,6 +36,7 @@ private:
     std::condition_variable m_cv_internal;
     std::map<std::string, DataPoint*> m_data_points;
     std::mutex m_mu;
+    std::string m_current_profile;
     ProfileFetch* m_profile_fetch;
     ProfileAnalyze* m_profile_analyze;
     FileHeader* m_file_header = nullptr;

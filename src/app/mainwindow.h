@@ -76,6 +76,6 @@ private:
     int m_plot_index = 0;
     std::map<std::string, QwtPlot*> m_plots;
     std::map<std::string, QwtPlotZoomer*> m_plot_zoomer;
-    std::vector<Qt::GlobalColor> m_colors = {Qt::green, Qt::blue, Qt::darkMagenta, Qt::cyan};
+    std::vector<Qt::GlobalColor> m_colors = {Qt::darkGreen, Qt::blue, Qt::darkMagenta, Qt::darkCyan};
 };
 

@@ -84,9 +84,10 @@ void DataFetch::fetch(std::vector<std::string> profiles) {
             return;
         }
 
+        m_current_profile = profiles[i];
         DataPoint* profile = new DataPoint();
-        int return_code = m_profile_fetch->fetch(profiles[i], profile);
-        m_data_points.insert({ profiles[i], profile });
+        int return_code = m_profile_fetch->fetch(m_current_profile, profile);
+        m_data_points.insert({ m_current_profile, profile });
         if (return_code != 0) {
             std::cerr << "An error occured while fetching profile \"" << profiles[i];
             std::cerr << "\", the function exited with error code " << return_code << std::endl;
@@ -99,6 +100,10 @@ void DataFetch::fetch(std::vector<std::string> profiles) {
     }
 
     data_ready = true;
+}
+
+std::string DataFetch::get_current_profile() {
+    return m_current_profile;
 }
 
 int DataFetch::load(std::string file_name) {
@@ -143,7 +148,8 @@ int DataFetch::load(std::string file_name) {
              >> dummy >> point->sigma_4_red
              >> dummy >> point->sigma_4_fit
              >> dummy >> point->fwhm
-             >> dummy >> point->fwhm_fit;
+             >> dummy >> point->fwhm_fit
+             >> dummy >> point->direction;
 
         if (point->name.length() < 5) point->name.insert(3, "0");
         m_file_header->profile_names.push_back(point->name);

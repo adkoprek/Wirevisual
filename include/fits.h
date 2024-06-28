@@ -1,6 +1,9 @@
 #pragma once
+
 #include <map>
 #include <string>
+
+
 enum FITS {
     TWO_SIGMA,
     TWO_SIGMA_RED,
