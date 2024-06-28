@@ -1,3 +1,20 @@
+//  _    _ _                _                 _ 
+// | |  | (_)              (_)               | |
+// | |  | |_ _ __ _____   ___ ___ _   _  __ _| |
+// | |/\| | | '__/ _ \ \ / / / __| | | |/ _` | |
+// \  /\  / | | |  __/\ V /| \__ \ |_| | (_| | |
+//  \/  \/|_|_|  \___| \_/ |_|___/\__,_|\__,_|_|
+//    https://git.psi.ch/hipa_apps/Wirevisual
+//
+// C-Styled functions to create a dump for transport
+//
+// This functiosn can dump the measured profile data
+// into a .001 file that can be interpreted by transport
+// an external program
+//
+// @Author: Anton Metzger
+// @Maintainer: Jochem Snuvernik
+
 #include <cstdlib>
 #include <stdio.h>
 #include <stdlib.h>
@@ -5,6 +22,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <time.h>
+
 #include "data_dump.h"
 
 #define True                                    (1==1)

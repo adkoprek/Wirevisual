@@ -1,3 +1,20 @@
+//  _    _ _                _                 _ 
+// | |  | (_)              (_)               | |
+// | |  | |_ _ __ _____   ___ ___ _   _  __ _| |
+// | |/\| | | '__/ _ \ \ / / / __| | | |/ _` | |
+// \  /\  / | | |  __/\ V /| \__ \ |_| | (_| | |
+//  \/  \/|_|_|  \___| \_/ |_|___/\__,_|\__,_|_|
+//    https://git.psi.ch/hipa_apps/Wirevisual
+//
+// Gaussian fit functions for a profile measurement
+//
+// This is an adaptation of the functions developed by
+// Anton Metzger for the Transprofs project and are reused
+// here
+//
+// @Author: Anton Metzger
+// @Maintainer: Jochem Snuvernik
+
 #include <cmath>
 #include <stdlib.h>
 #include <stdio.h>
@@ -8,6 +25,7 @@
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_blas.h>
 #include <gsl/gsl_multifit_nlin.h>
+
 #define True                                    (1==1)
 #define False                                   !True
 

@@ -1,6 +1,21 @@
-#include "data_dump.h"
-#include "currents.h"
-#include "data_fetch.h"
+//  _    _ _                _                 _ 
+// | |  | (_)              (_)               | |
+// | |  | |_ _ __ _____   ___ ___ _   _  __ _| |
+// | |/\| | | '__/ _ \ \ / / / __| | | |/ _` | |
+// \  /\  / | | |  __/\ V /| \__ \ |_| | (_| | |
+//  \/  \/|_|_|  \___| \_/ |_|___/\__,_|\__,_|_|
+//    https://git.psi.ch/hipa_apps/Wirevisual
+//
+// Class to dump the measured tada from DataFetch into files
+//
+// The files that are generated are to be used by other programs
+// like Transport and MinT. The files are generated in the 
+// directory stored int the env variable $TRANSMESS which should 
+// be at default /hipa/op/data/TransMess
+//
+// @Author: Adam Koprek
+// @Maintainer: Jochem Snuvernik
+
 #include <cerrno>
 #include <chrono>
 #include <cmath>
@@ -16,6 +31,10 @@
 #include <thread>
 #include <unistd.h>
 #include <vector>
+
+#include "data_dump.h"
+#include "currents.h"
+#include "data_fetch.h"
 #include "epics_commands.h"
 #include "fits.h"
 #include "profiles.h"
@@ -24,7 +43,10 @@
 #include <sys/wait.h>
 
 
+// The path whre external executables for HIPA are located
 #define BD_PATH "/hipa/bd/bin/"
+
+// The external function developed by metzger, look in create_trasnport.cpp
 extern int updateTransportFile(char *transLine, int nbDevs, str9 *Quads, int *QuadsSign, float *values,
                         str50 *qerrMsg, int nbProfs, str9 *Profs, str50 *perrMsg, float *sigma2,
                         char *broDev, char *broUnit, float broVal, char *actualTime,
@@ -33,11 +55,15 @@ extern int updateTransportFile(char *transLine, int nbDevs, str9 *Quads, int *Qu
 
 
 
+/************************************************************
+*                       public
+************************************************************/
+
 DataDump::DataDump(DataFetch* data_fetch) {
-    this->m_data_fetch = data_fetch;
     m_cafe = new CAFE;
     m_cafe->channelOpenPolicy.setTimeout(1.0);
     m_quad_fetch = new QuadFetch();
+    this->m_data_fetch = data_fetch;
 }
 
 DataDump::~DataDump() {
@@ -46,16 +72,25 @@ DataDump::~DataDump() {
     delete m_quad_fetch;
 }
 
+// Dump file with data from profile measurements
+//   - .mes
+//   - .022
+//   - .001
+//   - .dat
+//   - .mint
 void DataDump::dump(std::vector<std::string> beam_lines, FITS fit) {
     m_fit = fit;
     get_local_time();
 
     for (int i = 0; i < beam_lines.size(); i++) {
         m_beam_line = beam_lines[i];
+
+        // File name consists of the current date and time
         auto file_path = get_file_path();
         m_mes_file = new std::ofstream(file_path + ".mes");
         m_022_file = new std::ofstream(file_path + ".022");
 
+        // Call to external mint-snap program to gernerate .dat file
         mint("mint-snap", "0");
 
         // Fetch data
@@ -75,21 +110,19 @@ void DataDump::dump(std::vector<std::string> beam_lines, FITS fit) {
 
         m_quad_fetch->fetch(QUADS.at(m_beam_line));
         add_mes_quads();
-        
 
-        // Create all the transport files
+        // Create the .011 fie that is used with the external program transport
         create_transport_file();
-
 
         // Create .022 file
         *m_022_file << std::fixed << std::setw(10) << std::setprecision(1);
         add_022_quads();
-        add_022_sigmah();
-        add_022_sigmav();
+        add_022_sigma(m_sigma2_h);
+        add_022_sigma(m_sigma2_v);
 
         // Create MinT files
-        // move_dat_file();
-        // mint("mint-run", m_date);
+        move_dat_file();
+        mint("mint-run", m_date);
 
         m_mes_file->close();
         m_022_file->close();
@@ -98,6 +131,7 @@ void DataDump::dump(std::vector<std::string> beam_lines, FITS fit) {
     }
 }
 
+// Function to just dump the current settings of the quadrupol magnets
 void DataDump::dump_quads(std::vector<std::string> beam_lines, FITS fit) {
     m_fit = fit;
     get_local_time();
@@ -127,14 +161,22 @@ void DataDump::dump_quads(std::vector<std::string> beam_lines, FITS fit) {
     }
 }
 
+// Get the last file name without the extension
 std::string DataDump::get_last_date() {
     return m_date;
 }
 
+// Get the last human readeble data that is used in the file headers
 std::string DataDump::get_last_human_date() {
     return m_human_date;
 }
 
+
+/************************************************************
+*                       private
+************************************************************/
+
+// Function that fetches the current time and stores it in m_tm
 void DataDump::get_local_time() {
     time_t now = time(0);
     m_tm = localtime(&now);
@@ -142,6 +184,8 @@ void DataDump::get_local_time() {
     m_tm->tm_mon += 1;
 }
 
+// Generate the file name from the fetched date, the filename structure
+// <beamline>/<beamline>_<year><month><day>_<hour><minute><second>
 std::string DataDump::get_file_path() {
     std::string file_name;
 
@@ -163,6 +207,8 @@ std::string DataDump::get_file_path() {
     return std::string(getenv("TRANSMESS")) + "/" + m_beam_line + "/" + file_name;
 }
 
+// Get all the points of the current beamline that have valid data
+// and add them to a field
 void DataDump::fetch_current_profile_names() {
     m_current_profile_names.clear();
 
@@ -176,6 +222,7 @@ void DataDump::fetch_current_profile_names() {
     }
 }
     
+// Fetch the value and unit of the current monitor of the current beamline
 int DataDump::fetch_current() {
     m_current_monitor = CURENTS.at(m_beam_line);
     std::string pv = m_current_monitor + CURRENT_PV_MONITOR;
@@ -198,7 +245,10 @@ int DataDump::fetch_current() {
     return 0;
 }
 
+// Add a header to the .mes file
 void DataDump::add_mes_header() {
+    // The human readable data has the structure
+    // <day>-<month>-<year> <hour>:<minute>:<second>
     m_human_date = "";
     if (m_tm->tm_mday < 10) m_human_date += "0";
     m_human_date += std::to_string(m_tm->tm_mday) + "-";
@@ -223,6 +273,8 @@ void DataDump::add_mes_header() {
     *m_mes_file << "nbprofs    " << m_current_profile_names.size() << std::endl; 
 }
 
+// Add the actual profile measurement data with some data about 
+// every valid profile to the .mes file
 void DataDump::add_mes_profile_data(std::string profile) {
     auto point = m_data_fetch->get_data_point(profile);
     if (!point->valid_data) return;
@@ -239,6 +291,7 @@ void DataDump::add_mes_profile_data(std::string profile) {
     *m_mes_file << " 4sigmaFit " << point->sigma_4_fit;
     *m_mes_file << " fwhm "      << point->fwhm;
     *m_mes_file << " fwhmFit "   << point->mean_fit;
+    // Add data about in witch direction the profiles where driven
     *m_mes_file << "   dir "     << point->direction << std::endl;
 
     add_mes_vector(point->x);
@@ -246,6 +299,7 @@ void DataDump::add_mes_profile_data(std::string profile) {
     add_mes_vector(point->fit);
 }
 
+// Add the vector data for the x, y or fit values of a profile
 void DataDump::add_mes_vector(std::vector<double> data) {
     *m_mes_file << "           " << std::setprecision(6);
     for (int i = 0; i < data.size(); i++) 
@@ -253,6 +307,7 @@ void DataDump::add_mes_vector(std::vector<double> data) {
     *m_mes_file << std::endl;
 }
 
+// Add the data of the current quadrupole magnets to the .mes file
 void DataDump::add_mes_quads() {
     auto current_quads = QUADS.at(m_beam_line);
 
@@ -285,7 +340,9 @@ void DataDump::add_mes_quads() {
     *m_mes_file << std::endl;
 }
 
+// Call the external function to cretae the .001 transport file
 void DataDump::create_transport_file() {
+    // convert C++ style data into C styled data
     auto current_quads = QUADS.at(m_beam_line);
     int num_profiles = m_current_profile_names.size();
     float sigma_2[num_profiles], sigma_2_h[num_profiles], sigma_2_v[num_profiles];
@@ -299,6 +356,7 @@ void DataDump::create_transport_file() {
     for (int i = 0; i < current_quads.size(); i++) {
         strcpy((char*)&quads_arr[i], current_quads[i].c_str());
         values[i] = m_quad_fetch->get_quad(current_quads[i])->field;
+        // The beamline pktebhe requires other quad_signs
         if (m_beam_line == "pktebhe") quad_sign[i] = -1;
         else quad_sign[i] = 1;
     }
@@ -327,6 +385,7 @@ void DataDump::create_transport_file() {
     m_sigma2_v = std::vector<float>(sigma_2_v, sigma_2_v + nb_ver);
 }
 
+// Add the data of the quadrupole magnets to the .022 file
 void DataDump::add_022_quads() {
     auto current_quads = QUADS.at(m_beam_line);
 
@@ -344,36 +403,28 @@ void DataDump::add_022_quads() {
     }
 }
 
-void DataDump::add_022_sigmah() {
+// Add the computed 2sigma values from the earlier computet
+// updateTransportFile function
+void DataDump::add_022_sigma(std::vector<float> data) {
     int k = 0;
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 10; j++) {
             *m_022_file << std::setw(10);
-            if (k >= m_sigma2_h.size())
+            if (k >= data.size())
                 *m_022_file << 0.0;
             else
-                *m_022_file << m_sigma2_h[k];
+                *m_022_file << data[k];
             k++;
         }
         *m_022_file << std::endl;
     }
 }
 
-void DataDump::add_022_sigmav() {
-    int k = 0;
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 10; j++) {
-            *m_022_file << std::setw(10);
-            if (k >= m_sigma2_v.size())
-                *m_022_file << 0.0;
-            else
-                *m_022_file << m_sigma2_v[k];
-            k++;
-        }
-        *m_022_file << std::endl;
-    }
-}
-
+// Move local .dat file gnerated by mint-snap to the right location
+// mint-snap is an external program that is responsible for dumping 
+// some data from HIPA to a .dat file
+// The target file name isl
+// <beamline>/<beamline>_<date computed above>.dat
 void DataDump::move_dat_file() {
     std::string temp_dat_file;
     temp_dat_file += std::string(getenv("TRANSMESS")) + "/" + m_beam_line + "/";
@@ -396,6 +447,7 @@ void DataDump::move_dat_file() {
     }
 }
 
+// Run the external programs mint-snap or mint-run, where just one argument differs
 void DataDump::mint(std::string program, std::string time_stamp) {
     pid_t pid = fork();
 
@@ -413,12 +465,10 @@ void DataDump::mint(std::string program, std::string time_stamp) {
         options[3] = NULL;
         execvp(command, options);
 
-        std::cout << "Saved successfully 1" << std::endl;
         std::cerr << "An error occured while trying to run \n" << program << "\"";
         std::cerr << ", " << std::strerror(errno);
         exit(1);
     } else if (pid > 0) {} else  {
-        std::cout << "Saved successfully 2" << std::endl;
         std::cerr << "An error occured while trying to fork the process, ";
         std::cerr << "continueing without calling mint";
         return;
